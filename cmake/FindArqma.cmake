@@ -67,7 +67,7 @@ endif()
 
 message(STATUS ${ARQMA_SOURCE_DIR}/build/Linux/release-v0.2.1)
 
-# include monero headers
+# include Arqma headers
 include_directories(
 		${ARQMA_SOURCE_DIR}/src
 		${ARQMA_SOURCE_DIR}/external

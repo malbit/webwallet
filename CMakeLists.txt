@@ -12,7 +12,7 @@ if(CMAKE_SIZEOF_VOID_P EQUAL "4")
 endif()
 
 if (NOT ARQMA_DIR)
-    set(ARQMA_DIR ~/arqma2.1/arqma)
+    set(ARQMA_DIR ~/arqma)
 endif()
 
 option(BUILD_TEST "Build tests for the project" OFF)

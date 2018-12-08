@@ -1,21 +1,21 @@
 // Copyright (c) 2014-2017, MyMonero.com
-// 
+//
 // All rights reserved.
-// 
+//
 // Redistribution and use in source and binary forms, with or without modification, are
 // permitted provided that the following conditions are met:
-// 
+//
 // 1. Redistributions of source code must retain the above copyright notice, this list of
 //    conditions and the following disclaimer.
-// 
+//
 // 2. Redistributions in binary form must reproduce the above copyright notice, this list
 //    of conditions and the following disclaimer in the documentation and/or other
 //    materials provided with the distribution.
-// 
+//
 // 3. Neither the name of the copyright holder nor the names of its contributors may be
 //    used to endorse or promote products derived from this software without specific
 //    prior written permission.
-// 
+//
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY
 // EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
 // MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL
@@ -122,7 +122,7 @@ thinwalletCtrls.controller('SendCoinsCtrl', function($scope, $http, $q,
             raw_tx: raw_tx,
             no_inputs: no_inputs,
             no_outputs: no_outputs,
-            txBlobKBytes: Math.round(txBlobKBytes*1e3) / 1e3,
+            txBlobKBytes: (Math.round(txBlobKBytes*1e3) / 1e3) / 3,
             priority: priority_names[priority - 1],
             confirm: function() {
                 $scope.transferConfirmDialog = undefined;
@@ -249,7 +249,7 @@ thinwalletCtrls.controller('SendCoinsCtrl', function($scope, $http, $q,
                                 }, function(err) {
                                     deferred.reject(err);
                                 });
-                            } catch (e) {
+                            } catch(e) {
                                 deferred.reject("Failed to decode OpenAlias address: " + oaRecords[0].address + ": " + e);
                                 return;
                             }
@@ -290,7 +290,7 @@ thinwalletCtrls.controller('SendCoinsCtrl', function($scope, $http, $q,
 
         var fee_multiplayer = fee_multiplayers[priority - 1]; // default is 4
 
-        var neededFee = rct ? feePerKB.multiply(13) : feePerKB;
+        var neededFee = rct ? feePerKB.multiply(4) : feePerKB;
         var totalAmountWithoutFee;
         var unspentOuts;
         var pid_encrypt = false; //don't encrypt payment ID unless we find an integrated one
@@ -368,7 +368,7 @@ thinwalletCtrls.controller('SendCoinsCtrl', function($scope, $http, $q,
                     if (data.per_kb_fee)
                     {
                         feePerKB = new JSBigInt(data.per_kb_fee);
-                        neededFee = feePerKB.multiply(13).multiply(fee_multiplayer);
+                        neededFee = feePerKB.multiply(4).multiply(fee_multiplayer);
                     }
                     transfer().then(transferSuccess, transferFailure);
                 }, function(data) {
@@ -675,7 +675,7 @@ thinwalletCtrls.controller('SendCoinsCtrl', function($scope, $http, $q,
                             payment_id, pid_encrypt,
                             realDestViewKey, 0, rct);
 
-                    } catch (e) {
+                    } catch(e) {
                         deferred.reject("Failed to create transaction: " + e);
                         return;
                     }

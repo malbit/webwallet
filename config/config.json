@@ -9,7 +9,7 @@
   "blockchain-path" :
   {
     "_comment" : "if paths are empty, default Arqma paths will be used",
-    "mainnet"  : "/home/arq/.arqma/lmdb",
+    "mainnet"  : "",
     "testnet"  : "",
     "stagenet" : ""
   },
@@ -19,8 +19,8 @@
     "url"      : "127.0.0.1",
     "port"     : 3306,
     "dbname"   : "arqma",
-    "user"     : "arq",
-    "password" : "tescik123"
+    "user"     : "",
+    "password" : ""
   },
   "wallet_import" :
   {
@@ -44,7 +44,7 @@
     }
   },
   "refresh_block_status_every_seconds" : 10,
-  "blocks_search_lookahead"            : 200,
+  "blocks_search_lookahead"            : 50,
   "search_thread_life_in_seconds"      : 120,
   "max_number_of_blocks_to_import"     : 60000,
   "mysql_ping_every_seconds"           : 300,

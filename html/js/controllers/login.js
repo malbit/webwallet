@@ -1,21 +1,21 @@
 // Copyright (c) 2014-2015, MyMonero.com
-// 
+//
 // All rights reserved.
-// 
+//
 // Redistribution and use in source and binary forms, with or without modification, are
 // permitted provided that the following conditions are met:
-// 
+//
 // 1. Redistributions of source code must retain the above copyright notice, this list of
 //    conditions and the following disclaimer.
-// 
+//
 // 2. Redistributions in binary form must reproduce the above copyright notice, this list
 //    of conditions and the following disclaimer in the documentation and/or other
 //    materials provided with the distribution.
-// 
+//
 // 3. Neither the name of the copyright holder nor the names of its contributors may be
 //    used to endorse or promote products derived from this software without specific
 //    prior written permission.
-// 
+//
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY
 // EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
 // MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL
@@ -41,10 +41,10 @@ thinwalletCtrls.controller("LoginCtrl", function($scope, $location, AccountServi
 
     if (config.nettype == 1) {
         // just some dummy account, as not to fill login form every time.
-        $scope.mnemonic = "agenda shrugged liquid extra mundane phone nomad oust duckling sifting pledge loyal royal urban skater bawled gusts bounced boil violin mumble gags axle sapling shrugged";
+        $scope.mnemonic = "";
     } else if (config.nettype == 2) {
         // just some dummy account, as not to fill login form every time.
-        $scope.mnemonic = "gels lair teeming cease nanny utility inexact leisure civilian emerge zippers skew gasp enjoy fugitive nanny candy nuance muppet scrub uneven yard ulcers unquoted yard";
+        $scope.mnemonic = "";
     } else {
         $scope.address = "";
         $scope.view_key = "" ;
@@ -56,11 +56,11 @@ thinwalletCtrls.controller("LoginCtrl", function($scope, $location, AccountServi
         var seed;
         var keys;
 
-        switch (language) {
+        switch(language) {
             case 'english':
                 try {
                     seed = mn_decode(mnemonic);
-                } catch (e) {
+                } catch(e) {
                     // Try decoding as an electrum seed, on failure throw the original exception
                     try {
                         seed = mn_decode(mnemonic, "electrum");
@@ -77,7 +77,7 @@ thinwalletCtrls.controller("LoginCtrl", function($scope, $location, AccountServi
         keys = cnUtil.create_address(seed);
 
 
-        //var payment_id8 = rand_8();        
+        //var payment_id8 = rand_8();
         //var integarted_address = get_account_integrated_address(keys.public_addr, payment_id8);
 
         return [seed, keys];
@@ -136,7 +136,7 @@ thinwalletCtrls.controller("LoginCtrl", function($scope, $location, AccountServi
             $scope.view_key = keys.view.sec;
             $scope.spend_key = keys.spend.sec;
 
-        } catch (e) {
+        } catch(e) {
             console.log("Invalid mnemonic!");
             $scope.error = e;
             return;

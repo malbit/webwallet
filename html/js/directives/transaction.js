@@ -1,4 +1,4 @@
-thinwalletDirectives.directive('transaction', function () {
+thinwalletDirectives.directive('transaction', function() {
     return {
         restrict: 'E',
         templateUrl:"/js/directives/transaction.html",

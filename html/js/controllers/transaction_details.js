@@ -3,7 +3,7 @@
  */
 
 
-thinwalletCtrls.controller('TransactionDetailsCtrl', function ($scope,
+thinwalletCtrls.controller('TransactionDetailsCtrl', function($scope,
                                                                AccountService,
                                                                ModalService,
                                                                ApiCalls) {
@@ -59,7 +59,7 @@ thinwalletCtrls.controller('TransactionDetailsCtrl', function ($scope,
     else if (config.nettype == 1)
         explorerUrl = config.testnetExplorerUrl;
     else
-        explorerUrl = config.stagenetExplorerUrl; 
+        explorerUrl = config.stagenetExplorerUrl;
 
     var address = AccountService.getAddress();
     var view_key = AccountService.getViewKey();
