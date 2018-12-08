@@ -1,0 +1,59 @@
+{
+  "daemon-url" :
+  {
+    "_comment" : "RPC urls to arqma deamon",
+    "mainnet"  : "http://127.0.0.1:19994",
+    "testnet"  : "",
+    "stagenet" : ""
+  },
+  "blockchain-path" :
+  {
+    "_comment" : "if paths are empty, default Arqma paths will be used",
+    "mainnet"  : "/home/arq/.arqma/lmdb",
+    "testnet"  : "",
+    "stagenet" : ""
+  },
+  "database" :
+  {
+    "_comment" : "how should the backend connect to the mysql database",
+    "url"      : "127.0.0.1",
+    "port"     : 3306,
+    "dbname"   : "arqma",
+    "user"     : "arq",
+    "password" : "tescik123"
+  },
+  "wallet_import" :
+  {
+    "_comment": "if fee is 0, then importing is free. fee is in base 1e9, e.g., 0.1 arq is 0.1 x 1e9 = 100000000",
+    "fee"     : 0,
+    "testnet" :
+    {
+      "address" : "",
+      "viewkey" : ""
+    },
+    "mainnet" :
+    {
+      "_comment": "The ArQmA donation address",
+      "address" : "ar46iCiw5uB7SjnYhL5EJLP1LpqGkZbCcWhWgdbLL1c4DicNuYi3ZeRJPi8FFmEhYnagbxRyaQKyTYBA95JqmPcr1XZytK9o3",
+      "viewkey" : "4e5373dfd5ba67fa2988107a605bc960575c465bd07aba624915d3f660b73d62"
+    },
+    "stagenet" :
+    {
+      "address" : "",
+      "viewkey" : ""
+    }
+  },
+  "refresh_block_status_every_seconds" : 10,
+  "blocks_search_lookahead"            : 200,
+  "search_thread_life_in_seconds"      : 120,
+  "max_number_of_blocks_to_import"     : 60000,
+  "mysql_ping_every_seconds"           : 300,
+  "ssl" :
+  {
+    "enable" : false,
+    "_comment": "below are example paths to crt and key files need to be given",
+    "ssl-key": "file:///home/webwallet/ssl_certs/server.key",
+    "ssl-crt": "file:///home/webwallet/ssl_certs/server.crt",
+    "dh-pem" : "file:///home/webwallet/ssl_certs/dh2048.pem"
+  }
+}
