@@ -33,13 +33,13 @@ namespace restbed
 
         struct SettingsImpl
         {
-            uint16_t m_port = 1984;
+            uint16_t m_port = 80;
 
             std::string m_root = "/";
 
             unsigned int m_worker_limit = 0;
 
-            unsigned int m_connection_limit = 1024;
+            unsigned int m_connection_limit = 256;
 
             std::string m_bind_address = "";
 
@@ -51,7 +51,7 @@ namespace restbed
 
             std::multimap< std::string, std::string > m_default_headers { };
 
-            std::chrono::milliseconds m_connection_timeout = std::chrono::milliseconds( 50000 );
+            std::chrono::milliseconds m_connection_timeout = std::chrono::milliseconds( 25000 );
 
             std::map< int, std::string > m_status_messages
             {

@@ -256,7 +256,6 @@ MySqlAccounts::select(const string& address, XmrAccount& account)
     catch (std::exception const& e)
     {
         MYSQL_EXCEPTION_MSG(e);
-        //throw  e;
     }
 
     return false;
