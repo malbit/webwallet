@@ -33,13 +33,13 @@ namespace restbed
 
         struct SettingsImpl
         {
-            uint16_t m_port = 80;
+            uint16_t m_port = 1984;
 
             std::string m_root = "/";
 
             unsigned int m_worker_limit = 0;
 
-            unsigned int m_connection_limit = 256;
+            unsigned int m_connection_limit = 1024;
 
             std::string m_bind_address = "";
 
