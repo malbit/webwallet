@@ -3,11 +3,10 @@
 //
 
 #include "CurrentBlockchainStatus.h"
-#include "PaymentSearcher.hpp"
 
 
-#undef ARQMA_DEFAULT_LOG_CATEGORY
-#define ARQMA_DEFAULT_LOG_CATEGORY "arqwallet"
+#undef MONERO_DEFAULT_LOG_CATEGORY
+#define MONERO_DEFAULT_LOG_CATEGORY "openmonero"
 
 namespace xmreg
 {
@@ -27,7 +26,7 @@ void
 CurrentBlockchainStatus::monitor_blockchain()
 {
     TxSearch::set_search_thread_life(
-                bc_setup.search_thread_life);
+                bc_setup.search_thread_life_in_seconds);
 
     stop_blockchain_monitor_loop = false;
 
@@ -50,7 +49,8 @@ CurrentBlockchainStatus::monitor_blockchain()
            clean_search_thread_map();
 
            std::this_thread::sleep_for(
-                   bc_setup.refresh_block_status_every);
+                   std::chrono::seconds(
+                    bc_setup.refresh_block_status_every_seconds));
        }
 
        is_running = false;
@@ -300,7 +300,7 @@ CurrentBlockchainStatus::get_random_outputs(
         vector<uint64_t> const& amounts,
         uint64_t outs_count,
         RandomOutputs::outs_for_amount_v& found_outputs)
-{
+{   
     unique_ptr<RandomOutputs> ro
             = create_random_outputs_object(amounts, outs_count);
 
@@ -439,8 +439,8 @@ CurrentBlockchainStatus::search_if_payment_made(
 
     uint64_t current_blockchain_height = get_current_blockchain_height();
 
-    //cout << "current_blockchain_height: "
-    //     << current_blockchain_height << '\n';
+    cout << "current_blockchain_height: "
+         << current_blockchain_height << '\n';
 
     vector<transaction> txs_to_check;
 
@@ -477,7 +477,7 @@ CurrentBlockchainStatus::search_if_payment_made(
                             blk_txs.begin(), blk_txs.end());
     }
 
-  /*  for (transaction& tx: txs_to_check)
+    for (transaction& tx: txs_to_check)
     {
         if (is_coinbase(tx))
         {
@@ -504,8 +504,7 @@ CurrentBlockchainStatus::search_if_payment_made(
 
         if (!hex_to_pod(tx_payment_id_str, encrypted_payment_id8))
         {
-            OMERROR << "Failed parsing hex to pod for "
-                       "encrypted_payment_id8";
+            OMERROR << "Failed parsing hex to pod for encrypted_payment_id8";
             continue;
         }
 
@@ -547,9 +546,7 @@ CurrentBlockchainStatus::search_if_payment_made(
 
         string decrypted_tx_payment_id_str
                 = pod_to_hex(decrypted_payment_id8);
-*/
-    crypto::hash8 expected_payment_id;
-/*
+
         // check if decrypted payment id matches what we have stored
         // in mysql.
         if (payment_id_str != decrypted_tx_payment_id_str)
@@ -616,67 +613,34 @@ CurrentBlockchainStatus::search_if_payment_made(
                                       tx.rct_signatures
                                         .ecdhInfo[output_idx_in_tx].mask,
                                       rct_amount);
-*/
-    if (!hex_to_pod(payment_id_str, expected_payment_id))
-    {
-        OMERROR << "Cant convert payment id to pod: " << payment_id_str;
-        return false;
-    }
 
-/*                    if (!r)
+                    if (!r)
                     {
                         OMERROR << "Cant decode ringCT!";
                         return false;
                     }
-*/
-    PaymentSearcher<crypto::hash8> tx_searcher {
-        bc_setup.import_payment_address,
-        bc_setup.import_payment_viewkey,
-        mcore.get()};
 
-/*                    amount = rct_amount;
+                    amount = rct_amount;
                 }
-*/
 
-//            } // if (mine_output && tx.version >= 2)
-    auto found_amount_pair = std::make_pair(0ull, std::cend(txs_to_check));
+            } // if (mine_output && tx.version >= 2)
 
-    try
-    {
-        found_amount_pair
-                = tx_searcher.search(expected_payment_id, txs_to_check);
-    }
-    catch (PaymentSearcherExcemption const& e)
-    {
-        OMERROR << e.what();
-        return false;
-    }
 
-/*            if (mine_output)
+            if (mine_output)
                 total_received += amount;
         }
-*/
-    if (found_amount_pair.first >= desired_amount)
-    {
-        string tx_hash_str = pod_to_hex(get_transaction_hash(*found_amount_pair.second));
-    }
+
         OMINFO << " Payment id check in tx: "
                << tx_hash_str
-               << " found: " << found_amount_pair.first;
+               << " found: " << total_received;
 
-/*        if (total_received >= desired_amount)
+        if (total_received >= desired_amount)
         {
             // the payment has been made.
             tx_hash_with_payment = tx_hash_str;
             OMINFO << "Import payment done";
             return true;
         }
-*/
-        // the payment has been made
-        tx_hash_with_payment = tx_hash_str;
-        OMINFO << "Import payment done";
-
-        return true;
     }
 
     return false;
@@ -797,8 +761,7 @@ CurrentBlockchainStatus::get_known_outputs_keys(
     }
 
 
-    known_outputs_keys = get_search_thread(address)
-              .get_known_outputs_keys();
+    known_outputs_keys = get_search_thread(address).get_known_outputs_keys();
 
     return true;
 }
@@ -827,10 +790,8 @@ CurrentBlockchainStatus::get_xmr_address_viewkey(
         return false;
     }
 
-    address = get_search_thread(address_str)
-             .get_xmr_address_viewkey().first;
-    viewkey = get_search_thread(address_str)
-             .get_xmr_address_viewkey().second;
+    address = get_search_thread(address_str).get_xmr_address_viewkey().first;
+    viewkey = get_search_thread(address_str).get_xmr_address_viewkey().second;
 
     return true;
 }
@@ -988,8 +949,7 @@ CurrentBlockchainStatus::get_search_thread(string const& acc_address)
 
     if (it == searching_threads.end())
     {
-        OMERROR << "Search thread does not exisit for addr: "
-                << acc_address;
+        OMERROR << "Search thread does not exisit for addr: " << acc_address;
         throw std::runtime_error("Trying to accesses "
                                  "non-existing search thread");
     }
@@ -1152,3 +1112,4 @@ CurrentBlockchainStatus::get_txs_in_blocks(
 }
 
 }
+

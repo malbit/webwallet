@@ -29,7 +29,7 @@ handel_::operator()(const shared_ptr< Session > session)
 
 
 YourMoneroRequests::YourMoneroRequests(
-        shared_ptr<MySqlAccounts> _acc,
+        shared_ptr<MySqlAccounts> _acc, 
         shared_ptr<CurrentBlockchainStatus> _current_bc_status):
     xmr_accounts {_acc}, current_bc_status {_current_bc_status}
 {
@@ -255,7 +255,7 @@ YourMoneroRequests::get_address_txs(
                         {"height"         , tx.height},
                         {"mixin"          , tx.mixin},
                         {"payment_id"     , tx.payment_id},
-                        {"unlock_time"    , tx.unlock_time},
+                        {"unlock_time"    , tx.unlock_time},                  
                         {"total_sent"     , 0}, // to be field when checking for spent_outputs below
                         {"total_received" , std::to_string(tx.total_received)},
                         {"timestamp"      , static_cast<uint64_t>(tx.timestamp)*1000},
@@ -314,7 +314,7 @@ YourMoneroRequests::get_address_txs(
 
     } // if (current_bc_status->search_thread_exist(xmr_address))
     else
-    {
+    {        
         j_response = json {{"status", "error"},
                            {"reason", "Search thread does not exist."}};
 
@@ -1531,7 +1531,7 @@ YourMoneroRequests::get_tx(
         {
             OutputInputIdentification oi_identification {
                 &address_info, &viewkey, &tx, tx_hash,
-                        coinbase};
+                        coinbase, current_bc_status};
 
             oi_identification.identify_outputs();
 
@@ -1643,11 +1643,11 @@ YourMoneroRequests::get_tx(
                         // and inputs in a given tx.
                         OutputInputIdentification oi_identification
                                 {&address_info, &viewkey, &tx, tx_hash,
-                                    coinbase};
+                                    coinbase, current_bc_status};
 
                         // no need mutex here, as this will be exectued only
                         // after the above. there is no threads here.
-                        oi_identification.identify_inputs(known_outputs_keys, current_bc_status.get());
+                        oi_identification.identify_inputs(known_outputs_keys);
 
                         json j_spent_outputs = json::array();
 
@@ -1974,3 +1974,6 @@ YourMoneroRequests::parse_request(
 }
 
 }
+
+
+

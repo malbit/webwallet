@@ -13,7 +13,9 @@ OutputInputIdentification::OutputInputIdentification(
     const secret_key* _v,
     const transaction* _tx,
     crypto::hash const& _tx_hash,
-    bool is_coinbase)
+    bool is_coinbase,
+    std::shared_ptr<CurrentBlockchainStatus> _current_bc_status)
+    : current_bc_status {_current_bc_status}
 {
     address_info = _a;
     viewkey = _v;
@@ -156,8 +158,7 @@ OutputInputIdentification::identify_outputs()
 
 void
 OutputInputIdentification::identify_inputs(
-        unordered_map<public_key, uint64_t> const& known_outputs_keys,
-        CurrentBlockchainStatus* current_bc_status)
+        unordered_map<public_key, uint64_t> const& known_outputs_keys)
 {
     vector<txin_to_key> input_key_imgs = xmreg::get_key_images(*tx);
 
@@ -203,7 +204,7 @@ OutputInputIdentification::identify_inputs(
             auto it = known_outputs_keys.find(output_data.pubkey);
 
             if (it != known_outputs_keys.end())
-            {
+            {                                                
                 // this seems to be our mixin.
                 // save it into identified_inputs vector
 

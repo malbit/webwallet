@@ -710,14 +710,13 @@ get_payment_id(const vector<uint8_t>& extra,
 }
 
 
-/*bool
+bool
 get_payment_id(const transaction& tx,
                crypto::hash& payment_id,
                crypto::hash8& payment_id8)
 {
     return get_payment_id(tx.extra, payment_id, payment_id8);
 }
-*/
 
 
 array<size_t, 5>
@@ -1561,3 +1560,4 @@ populate_known_outputs_from_csv(
 
 
 }
+

@@ -100,7 +100,7 @@ public:
     vector<output_info> identified_outputs;
     vector<input_info>  identified_inputs;
 
-//    std::shared_ptr<CurrentBlockchainStatus> current_bc_status;
+    std::shared_ptr<CurrentBlockchainStatus> current_bc_status;
 
     // default constructor. Useful for unit tests
     OutputInputIdentification() = default;
@@ -109,7 +109,9 @@ public:
                               const secret_key* _v,
                               const transaction* _tx,
                               crypto::hash const& _tx_hash,
-                              bool is_coinbase);
+                              bool is_coinbase,
+                              std::shared_ptr<CurrentBlockchainStatus>
+                                _current_bc_status);
 
     /**
      * FIRST step. search for the incoming xmr using address, viewkey and
@@ -137,8 +139,8 @@ public:
      *
      */
     virtual void
-    identify_inputs(unordered_map<public_key, uint64_t> const& known_outputs_keys,
-                    CurrentBlockchainStatus* current_bc_status);
+    identify_inputs(unordered_map<public_key, uint64_t> const&
+                    known_outputs_keys);
 
     virtual string const&
     get_tx_hash_str();

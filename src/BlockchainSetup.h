@@ -17,8 +17,6 @@ using namespace crypto;
 using namespace cryptonote;
 using namespace std;
 
-using chrono::seconds;
-
 class BlockchainSetup
 {
 public:
@@ -39,23 +37,25 @@ public:
 
     network_type net_type;
 
-    bool do_not_relay {false};
+    bool do_not_relay;
 
-    seconds refresh_block_status_every {10};
-    seconds search_thread_life {120};
-    seconds mysql_ping_every {300};
+    uint64_t refresh_block_status_every_seconds;
 
-    uint64_t search_thread_life {20};
+    uint64_t blocks_search_lookahead;
 
-    uint64_t max_number_of_blocks_to_import {60000};
+    uint64_t max_number_of_blocks_to_import;
+
+    uint64_t search_thread_life_in_seconds;
+
+    uint64_t mysql_ping_every_seconds;
 
     string   import_payment_address_str;
     string   import_payment_viewkey_str;
 
-    uint64_t import_fee {0};
+    uint64_t import_fee;
 
-    uint64_t spendable_age {4};
-    uint64_t spendable_age_coinbase {18};
+    uint64_t spendable_age;
+    uint64_t spendable_age_coinbase;
 
     address_parse_info import_payment_address;
     secret_key         import_payment_viewkey;

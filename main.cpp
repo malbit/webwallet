@@ -169,7 +169,7 @@ catch(std::exception const& e)
 
 xmreg::MysqlPing mysql_ping {
         mysql_accounts->get_connection(),
-        bc_setup.mysql_ping_every};
+        bc_setup.mysql_ping_every_seconds};
 
 xmreg::ThreadRAII mysql_ping_thread(
         std::thread(std::ref(mysql_ping)),
