@@ -45,7 +45,7 @@ public:
     seconds search_thread_life {120};
     seconds mysql_ping_every {300};
 
-    uint64_t blocks_search_lookahead {20};
+    uint64_t search_thread_life {20};
 
     uint64_t max_number_of_blocks_to_import {60000};
 
