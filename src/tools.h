@@ -178,6 +178,12 @@ get_payment_id(transaction const& tx)
     return make_tuple(payment_id, payment_id8)
 }
 
+// Encryption and decryption are the same operation (xor with a key)
+bool
+encrypt_payment_id(crypto::hash8 &payment_id,
+                   const crypto::public_key &public_key,
+                   const crypto::secret_key &secret_key);
+
 
 inline double
 get_xmr(uint64_t core_amount)
@@ -207,6 +213,13 @@ decode_ringct(const rct::rctSig & rv,
               unsigned int i,
               rct::key & mask,
               uint64_t & amount);
+
+bool
+decode_ringct(rct::rctSig const& rv,
+              crypto::key_derivation const& derivation,
+              unsigned int i,
+              rct::key& mask,
+              uint64_t& amount);
 
 bool
 url_decode(const std::string& in, std::string& out);
