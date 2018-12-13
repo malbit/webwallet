@@ -631,7 +631,8 @@ CurrentBlockchainStatus::search_if_payment_made(
 */
     PaymentSearcher<crypto::hash8> tx_searcher {
         bc_setup.import_payment_address,
-        bc_setup.import_payment_viewkey};
+        bc_setup.import_payment_viewkey,
+        mcore.get()};
 
 /*                    amount = rct_amount;
                 }

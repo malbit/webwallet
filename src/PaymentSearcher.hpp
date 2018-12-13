@@ -2,7 +2,6 @@
 
 #include "om_log.h"
 #include "OutputInputIdentification.h"
-#include "UniversalIdentifier.hpp"
 
 #include <map>
 #include <utility>
@@ -25,13 +24,17 @@ class PaymentSearcherException: public std::runtime_error
 template<typename Hash_T>
 class PaymentSearcher
 {
+    // null hash value for hash8 or regular hash
+    using null_hash_T = boost::value_initialized<Hash_T>;
 
 public:
     PaymentSearcher(
             address_parse_info const& _address_info,
-            secret_key const& _viewkey):
+            secret_key const& _view_key,
+            MicroCore* const _mcore):
           address_info {_address_info},
-          viewkey {_viewkey}
+          view_key {_view_key},
+          mcore {_mcore}
     {}
 
 
@@ -52,7 +55,8 @@ public:
 
         // iterator to last txs that we found containing
         // our payment
-        auto found_tx_it = std::cend(txs);
+        typename Cont_T<transaction>::const_iterator found_tx_it
+                = std::cend(txs);
 
         for (auto it = std::cbegin(txs);
              it != std::cend(txs); ++it)
@@ -64,23 +68,29 @@ public:
             if (skip_coinbase && is_coinbase_tx)
                 continue;
 
-            auto identifier = make_identifier(tx,
-                              make_unique<Output>(&address_info, &viewkey),
-                              make_unique<IntegratedPaymentID>(&address_info, &viewkey));
+            // get payment id. by default we are intrested
+            // in short ids from integrated addresses
+            auto payment_id_tuple = xmreg::get_payment_id(tx);
 
-            auto tx_pub_key = identifier.get_tx_pub_key();
+            auto pay_id = std::get<Hash_T>(payment_id_tuple);
 
-            identifier.template get<IntegratedPaymentID>()
-                      ->identify(tx, tx_pub_key);
+            if (pay_id == null_hash)
+                continue;
 
-            auto pay_id = identifier.template get<IntegratedPaymentID>()
-                      ->get();
+            public_key tx_pub_key
+                    = xmreg::get_tx_pub_key_from_received_outs(tx);
 
             // we have pay_id. it can be crypto::hash8 or crypto:hash
             // so naw we need to perform comparison of the pay_id found
             // with the expected value of payment_id
             // for hash8 we need to do decoding of the pay_id, as it is
             // encoded
+
+            if (!payment_id_decryptor(pay_id, tx_pub_key))
+            {
+                throw PaymentSearcherException("Cant decrypt pay_id: "
+                                               + pod_to_hex(pay_id));
+            }
 
             if (pay_id != expected_payment_id)
                 continue;
@@ -91,17 +101,22 @@ public:
             // for each output, in a tx, check if it belongs
             // to the given account of specific address and viewkey
 
-            identifier.template get<Output>()->identify(tx, tx_pub_key);
+            auto tx_hash = get_transaction_hash(tx);
 
-            auto const& outputs_found = identifier.template get<Output>()->get();
+            OutputInputIdentification oi_identification {
+                        &address_info, &view_key, &tx,
+                        tx_hash, is_coinbase_tx};
 
-            if (!outputs_found.empty())
+            oi_identification.identify_outputs();
+
+
+            if (!oi_identification.identified_outputs.empty())
             {   // nothing was found
                 make_pair(found_amount, found_tx_it);
             }
 
             // now add the found outputs into Outputs tables
-            for (auto& out_info: outputs_found)
+            for (auto& out_info: oi_identification.identified_outputs)
                 found_amount += out_info.amount;
 
             if (found_amount > 0)
@@ -111,11 +126,35 @@ public:
         return make_pair(found_amount, found_tx_it);
     }
 
+
     virtual ~PaymentSearcher() = default;
 
 private:
     address_parse_info const& address_info;
-    secret_key const& viewkey;
+    secret_key const& view_key;
+    Hash_T payment_id;
+    MicroCore* const mcore;
+
+
+    inline bool
+    payment_id_decryptor(
+            crypto::hash& payment_id,
+            public_key const& tx_pub_key)
+    {
+        // don't need to do anything for legacy payment ids
+        return true;
+    }
+
+    inline bool
+    payment_id_decryptor(
+            crypto::hash8& payment_id,
+            public_key const& tx_pub_key)
+    {
+        // overload for short payment id,
+        // the we are going to decrypt
+        return mcore->decrypt_payment_id(
+                    payment_id, tx_pub_key, view_key);
+    }
 
 };
 
