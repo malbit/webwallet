@@ -53,7 +53,7 @@ public:
      * Create BlockchainLMDB on the heap.
      * Open database files located in blockchain_path.
      * Initialize m_blockchain_storage with the BlockchainLMDB object.
-     */    
+     */
     virtual bool
     init(const string& _blockchain_path, network_type nt);
 
@@ -189,7 +189,7 @@ public:
     get_tx(crypto::hash const& tx_hash, transaction& tx) const;
 
     virtual bool
-    decrypt_payment_id(crypto::hash8 &payment_id,
+    decrypt_payment_id(crypto::hash8& payment_id,
                        public_key const& public_key,
                        secret_key const& secret_key)
     {
@@ -200,7 +200,7 @@ public:
 
 
     virtual bool
-    init_success() const;    
+    init_success() const;
 
     virtual ~MicroCore();
 };

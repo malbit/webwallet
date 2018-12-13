@@ -51,7 +51,7 @@ namespace restbed
 
             std::multimap< std::string, std::string > m_default_headers { };
 
-            std::chrono::milliseconds m_connection_timeout = std::chrono::milliseconds( 50000 );
+            std::chrono::milliseconds m_connection_timeout = std::chrono::milliseconds( 25000 );
 
             std::map< int, std::string > m_status_messages
             {

@@ -24,7 +24,23 @@ MysqlPing::operator()()
     {
         std::this_thread::sleep_for(chrono::seconds(ping_time));
 
-	OMINFO << "Mysql ping is ignored." ;
+        if (auto c = conn.lock())
+        {
+            if (!c->ping())
+            {
+                OMERROR << "Pinging mysql failed. Stoping mysql pinging thread.";
+                why_stoped = StopReason::PingFailed;
+                break;
+            }
+
+            OMINFO << "Mysql ping successful." ;
+        }
+        else
+        {
+            OMERROR << "std::weak_ptr<MySqlConnector> conn expired!";
+            why_stoped = StopReason::PointerExpired;
+            break;
+        }
 
         ++counter;
     }
