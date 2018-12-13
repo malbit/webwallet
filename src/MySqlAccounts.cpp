@@ -451,8 +451,8 @@ MySqlAccounts::select_by_primary_id(uint64_t id, T& selected_data)
     return false;
 }
 
-//template
-//bool MySqlAccounts::select_by_primary_id<XmrTransaction>(uint64_t id, XmrTransaction& selected_data);
+template
+bool MySqlAccounts::select_by_primary_id<XmrTransaction>(uint64_t id, XmrTransaction& selected_data);
 
 template
 bool MySqlAccounts::select_by_primary_id<XmrInput>(uint64_t id, XmrInput& selected_data);
