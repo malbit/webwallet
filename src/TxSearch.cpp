@@ -46,7 +46,7 @@ TxSearch::TxSearch(XmrAccount& _acc,
     // this accont
     searched_blk_no = acc->scanned_block_height;
 
-    last_ping_timestamp = 0;
+    last_ping_timestamp = 0s;
 
     ping();
 }
@@ -55,12 +55,15 @@ void
 TxSearch::operator()()
 {
 
-    uint64_t current_timestamp = get_current_timestamp();
+    seconds current_timestamp = get_current_timestamp();
 
     last_ping_timestamp = current_timestamp;
 
     uint64_t blocks_lookahead
             = current_bc_status->get_bc_setup().blocks_search_lookahead;
+
+
+    auto current_bc_status_ptr = current_bc_status.get();
 
     // we put everything in massive catch, as there are plenty ways in which
     // an exceptions can be thrown here. Mostly from mysql.
@@ -71,7 +74,7 @@ TxSearch::operator()()
     {
         while(continue_search)
         {
-            uint64_t loop_timestamp {current_timestamp};
+            seconds loop_timestamp {current_timestamp};
 
             uint64_t last_block_height = current_bc_status->current_height;
 
@@ -88,7 +91,7 @@ TxSearch::operator()()
                 std::this_thread::sleep_for(
                         std::chrono::seconds(
                                 current_bc_status->get_bc_setup()
-                                .refresh_block_status_every_seconds)
+                                .refresh_block_status_every)
                 );
 
                 loop_timestamp = get_current_timestamp();
@@ -170,7 +173,7 @@ TxSearch::operator()()
                 // and inputs in a given tx.
                 OutputInputIdentification oi_identification {
                             &address, &viewkey, &tx, tx_hash,
-                            is_coinbase, current_bc_status};
+                            is_coinbase};
 
                 // flag indicating whether the txs in the given block are spendable.
                 // this is true when block number is more than 10 blocks from current
@@ -294,9 +297,9 @@ TxSearch::operator()()
                     }
 
                     if (tx_mysql_id == 0)
-                    {                        
+                    {
                         OMERROR << "tx_mysql_id is zero!" << tx_data;
-                        throw TxSearchException("tx_mysql_id is zero!");                        
+                        throw TxSearchException("tx_mysql_id is zero!");
                     }
 
                     vector<XmrOutput> outputs_found;
@@ -340,7 +343,7 @@ TxSearch::operator()()
                             = xmr_accounts->insert(outputs_found);
 
                     if (no_rows_inserted == 0)
-                    {                        
+                    {
                         throw TxSearchException("no_rows_inserted is zero!");
                     }
 
@@ -350,7 +353,7 @@ TxSearch::operator()()
 
                 // no need mutex here, as this will be exectued only after
                 // the above. there is no threads here.
-                oi_identification.identify_inputs(known_outputs_keys);
+                oi_identification.identify_inputs(known_outputs_keys, current_bc_status_ptr);
 
 
                 if (!oi_identification.identified_inputs.empty())
@@ -507,7 +510,7 @@ TxSearch::operator()()
                                 // it already
                                 // exisits in the MySQL. So maybe can now
                                 // check if we have it and get tx_mysql_id this
-                                // way.                               
+                                // way.
                             }
 
                         } //   if (tx_mysql_id == 0)
@@ -565,7 +568,7 @@ TxSearch::operator()()
 
         } // while(continue_search)
 
-    }   
+    }
     catch(...)
     {
         OMERROR << "Exception in TxSearch for " << acc->address;
@@ -600,20 +603,21 @@ TxSearch::get_searched_blk_no() const
     return searched_blk_no;
 }
 
-inline uint64_t
+inline seconds
 TxSearch::get_current_timestamp() const
 {
-   return  chrono::duration_cast<chrono::seconds>(
-          chrono::system_clock::now().time_since_epoch()).count();
+   return  chrono::duration_cast<seconds>(
+          chrono::system_clock::now().time_since_epoch());
 }
 
 void
 TxSearch::ping()
 {
-    OMINFO << "New last_ping_timestamp: " << last_ping_timestamp;
+    OMINFO << "New last_ping_timestamp: "
+           << last_ping_timestamp.count();
 
-    last_ping_timestamp = chrono::duration_cast<chrono::seconds>(
-            chrono::system_clock::now().time_since_epoch()).count();
+    last_ping_timestamp = chrono::duration_cast<seconds>(
+            chrono::system_clock::now().time_since_epoch());
 }
 
 bool
@@ -651,12 +655,14 @@ void
 TxSearch::find_txs_in_mempool(
         TxSearch::pool_txs_t mempool_txs,
         json* j_transactions)
-{   
+{
 
     *j_transactions = json::array();
 
     uint64_t current_height = current_bc_status
             ->get_current_blockchain_height();
+
+    auto current_bc_status_ptr = current_bc_status.get();
 
     known_outputs_t known_outputs_keys_copy = get_known_outputs_keys();
 
@@ -682,8 +688,7 @@ TxSearch::find_txs_in_mempool(
         // Class that is resposnible for idenficitaction of our outputs
         // and inputs in a given tx.
         OutputInputIdentification oi_identification
-                 {&address, &viewkey, &tx, tx_hash, coinbase,
-                 current_bc_status};
+                 {&address, &viewkey, &tx, tx_hash, coinbase};
 
         // FIRSt step. to search for the incoming xmr, we use address,
         // viewkey and
@@ -729,7 +734,7 @@ TxSearch::find_txs_in_mempool(
 
         // no need mutex here, as this will be exectued only after
         // the above. there is no threads here.
-        oi_identification.identify_inputs(known_outputs_keys_copy);
+        oi_identification.identify_inputs(known_outputs_keys_copy, current_bc_status_ptr);
 
         if (!oi_identification.identified_inputs.empty())
         {
@@ -836,7 +841,7 @@ TxSearch::get_xmr_address_viewkey() const
 
 
 void
-TxSearch::set_search_thread_life(uint64_t life_seconds)
+TxSearch::set_search_thread_life(seconds life_seconds)
 {
     thread_search_life = life_seconds;
 }
@@ -866,6 +871,6 @@ TxSearch::delete_existing_tx_if_exists(string const& tx_hash)
 
 
 // default value of static veriables
-uint64_t TxSearch::thread_search_life {600};
+seconds TxSearch::thread_search_life {120};
 
 }
