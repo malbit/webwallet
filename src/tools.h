@@ -175,7 +175,7 @@ get_payment_id(transaction const& tx)
 
     get_payment_id(tx.extra, payment_id, payment_id8);
 
-    return make_tuple(payment_id, payment_id8);
+    return make_tuple(payment_id, payment_id8)
 }
 
 // Encryption and decryption are the same operation (xor with a key)
