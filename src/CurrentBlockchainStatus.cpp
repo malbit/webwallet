@@ -645,7 +645,7 @@ CurrentBlockchainStatus::search_if_payment_made(
         found_amount_pair
                 = tx_searcher.search(expected_payment_id, txs_to_check);
     }
-    catch (PaymentSearcherException const& e)
+    catch (PaymentSearcherExcemption const& e)
     {
         OMERROR << e.what();
         return false;
