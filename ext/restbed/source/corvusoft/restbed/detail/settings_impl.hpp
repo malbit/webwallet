@@ -33,7 +33,7 @@ namespace restbed
 
         struct SettingsImpl
         {
-            uint16_t m_port = 1984;
+            uint16_t m_port = 80;
 
             std::string m_root = "/";
 
