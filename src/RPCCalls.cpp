@@ -92,7 +92,7 @@ RPCCalls::operator!=(RPCCalls const& a)
 
 
 bool
-RPCCalls::connect_to_monero_deamon()
+RPCCalls::connect_to_arqma_deamon()
 {
     if(m_http_client.is_connected())
     {
@@ -119,7 +119,7 @@ RPCCalls::commit_tx(
 
     std::lock_guard<std::mutex> guard(m_daemon_rpc_mutex);
 
-    if (!connect_to_monero_deamon())
+    if (!connect_to_arqma_deamon())
     {
         cerr << "get_current_height: not connected to deamon" << endl;
         return false;

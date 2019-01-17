@@ -6,7 +6,7 @@
 #ifndef CROWXMR_RPCCALLS_H
 #define CROWXMR_RPCCALLS_H
 
-#include "monero_headers.h"
+#include "arqma_headers.h"
 
 #include <mutex>
 
@@ -50,7 +50,7 @@ public:
     operator!=(RPCCalls const& a);
 
     virtual bool
-    connect_to_monero_deamon();
+    connect_to_arqma_deamon();
 
     virtual bool
     commit_tx(const string& tx_blob,

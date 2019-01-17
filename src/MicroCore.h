@@ -8,7 +8,7 @@
 #include <iostream>
 #include <random>
 
-#include "monero_headers.h"
+#include "arqma_headers.h"
 #include "tools.h"
 
 namespace xmreg

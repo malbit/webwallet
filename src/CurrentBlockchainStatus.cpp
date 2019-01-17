@@ -5,8 +5,8 @@
 #include "CurrentBlockchainStatus.h"
 
 
-#undef MONERO_DEFAULT_LOG_CATEGORY
-#define MONERO_DEFAULT_LOG_CATEGORY "openmonero"
+#undef ARQMA_DEFAULT_LOG_CATEGORY
+#define ARQMA_DEFAULT_LOG_CATEGORY "arqwallet"
 
 namespace xmreg
 {
@@ -71,7 +71,7 @@ CurrentBlockchainStatus::update_current_blockchain_height()
 }
 
 bool
-CurrentBlockchainStatus::init_monero_blockchain()
+CurrentBlockchainStatus::init_arqma_blockchain()
 {
     // initialize the core using the blockchain path
     return mcore->init(bc_setup.blockchain_path, bc_setup.net_type);}
@@ -680,7 +680,7 @@ CurrentBlockchainStatus::get_output_key(
 
 bool
 CurrentBlockchainStatus::start_tx_search_thread(
-        XmrAccount acc, std::unique_ptr<TxSearch> tx_search)
+        ArqAccount acc, std::unique_ptr<TxSearch> tx_search)
 {
     std::lock_guard<std::mutex> lck (searching_threads_map_mtx);
 
@@ -776,7 +776,7 @@ CurrentBlockchainStatus::search_thread_exist(const string& address)
 }
 
 bool
-CurrentBlockchainStatus::get_xmr_address_viewkey(
+CurrentBlockchainStatus::get_arq_address_viewkey(
         const string& address_str,
         address_parse_info& address,
         secret_key& viewkey)
@@ -790,8 +790,8 @@ CurrentBlockchainStatus::get_xmr_address_viewkey(
         return false;
     }
 
-    address = get_search_thread(address_str).get_xmr_address_viewkey().first;
-    viewkey = get_search_thread(address_str).get_xmr_address_viewkey().second;
+    address = get_search_thread(address_str).get_arq_address_viewkey().first;
+    viewkey = get_search_thread(address_str).get_arq_address_viewkey().second;
 
     return true;
 }

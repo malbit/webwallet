@@ -25,7 +25,7 @@ namespace xmreg {
 
 using namespace std;
 
-class XmrAccount;
+class ArqAccount;
 class MySqlAccounts;
 
 
@@ -72,7 +72,7 @@ public:
     update_current_blockchain_height();
 
     virtual bool
-    init_monero_blockchain();
+    init_arqma_blockchain();
 
     // inject TxUnlockChecker object
     // its simplifies mocking its behavior in our
@@ -174,7 +174,7 @@ public:
     // definitions of these function are at the end of this file
     // due to forward declaraions of TxSearch
     virtual bool
-    start_tx_search_thread(XmrAccount acc,
+    start_tx_search_thread(ArqAccount acc,
                            std::unique_ptr<TxSearch> tx_search);
 
     virtual bool
@@ -184,7 +184,7 @@ public:
     search_thread_exist(const string& address);
 
     virtual bool
-    get_xmr_address_viewkey(const string& address_str,
+    get_arq_address_viewkey(const string& address_str,
                             address_parse_info& address,
                             secret_key& viewkey);
     virtual bool
