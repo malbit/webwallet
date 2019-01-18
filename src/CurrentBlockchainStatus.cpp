@@ -26,7 +26,7 @@ void
 CurrentBlockchainStatus::monitor_blockchain()
 {
     TxSearch::set_search_thread_life(
-                bc_setup.search_thread_life_in_seconds);
+                bc_setup.search_thread_life);
 
     stop_blockchain_monitor_loop = false;
 
@@ -49,8 +49,7 @@ CurrentBlockchainStatus::monitor_blockchain()
            clean_search_thread_map();
 
            std::this_thread::sleep_for(
-                   std::chrono::seconds(
-                    bc_setup.refresh_block_status_every_seconds));
+                    bc_setup.refresh_block_status_every));
        }
 
        is_running = false;
@@ -300,7 +299,7 @@ CurrentBlockchainStatus::get_random_outputs(
         vector<uint64_t> const& amounts,
         uint64_t outs_count,
         RandomOutputs::outs_for_amount_v& found_outputs)
-{   
+{
     unique_ptr<RandomOutputs> ro
             = create_random_outputs_object(amounts, outs_count);
 
@@ -504,7 +503,8 @@ CurrentBlockchainStatus::search_if_payment_made(
 
         if (!hex_to_pod(tx_payment_id_str, encrypted_payment_id8))
         {
-            OMERROR << "Failed parsing hex to pod for encrypted_payment_id8";
+            OMERROR << "Failed parsing hex to pod for "
+                       "encrypted_payment_id8";
             continue;
         }
 
@@ -680,7 +680,7 @@ CurrentBlockchainStatus::get_output_key(
 
 bool
 CurrentBlockchainStatus::start_tx_search_thread(
-        ArqAccount acc, std::unique_ptr<TxSearch> tx_search)
+        XmrAccount acc, std::unique_ptr<TxSearch> tx_search)
 {
     std::lock_guard<std::mutex> lck (searching_threads_map_mtx);
 
@@ -761,7 +761,8 @@ CurrentBlockchainStatus::get_known_outputs_keys(
     }
 
 
-    known_outputs_keys = get_search_thread(address).get_known_outputs_keys();
+    known_outputs_keys = get_search_thread(address)
+            .get_known_outputs_keys();
 
     return true;
 }
@@ -776,7 +777,7 @@ CurrentBlockchainStatus::search_thread_exist(const string& address)
 }
 
 bool
-CurrentBlockchainStatus::get_arq_address_viewkey(
+CurrentBlockchainStatus::get_xmr_address_viewkey(
         const string& address_str,
         address_parse_info& address,
         secret_key& viewkey)
@@ -790,8 +791,10 @@ CurrentBlockchainStatus::get_arq_address_viewkey(
         return false;
     }
 
-    address = get_search_thread(address_str).get_arq_address_viewkey().first;
-    viewkey = get_search_thread(address_str).get_arq_address_viewkey().second;
+    address = get_search_thread(address_str)
+            .get_xmr_address_viewkey().first;
+    viewkey = get_search_thread(address_str)
+            .get_xmr_address_viewkey().second;
 
     return true;
 }
@@ -949,7 +952,8 @@ CurrentBlockchainStatus::get_search_thread(string const& acc_address)
 
     if (it == searching_threads.end())
     {
-        OMERROR << "Search thread does not exisit for addr: " << acc_address;
+        OMERROR << "Search thread does not exisit for addr: "
+                << acc_address;
         throw std::runtime_error("Trying to accesses "
                                  "non-existing search thread");
     }
@@ -1112,4 +1116,3 @@ CurrentBlockchainStatus::get_txs_in_blocks(
 }
 
 }
-

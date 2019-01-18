@@ -29,7 +29,7 @@ handel_::operator()(const shared_ptr< Session > session)
 
 
 YourMoneroRequests::YourMoneroRequests(
-        shared_ptr<MySqlAccounts> _acc, 
+        shared_ptr<MySqlAccounts> _acc,
         shared_ptr<CurrentBlockchainStatus> _current_bc_status):
     xmr_accounts {_acc}, current_bc_status {_current_bc_status}
 {
@@ -255,7 +255,7 @@ YourMoneroRequests::get_address_txs(
                         {"height"         , tx.height},
                         {"mixin"          , tx.mixin},
                         {"payment_id"     , tx.payment_id},
-                        {"unlock_time"    , tx.unlock_time},                  
+                        {"unlock_time"    , tx.unlock_time},
                         {"total_sent"     , 0}, // to be field when checking for spent_outputs below
                         {"total_received" , std::to_string(tx.total_received)},
                         {"timestamp"      , static_cast<uint64_t>(tx.timestamp)*1000},
@@ -314,7 +314,7 @@ YourMoneroRequests::get_address_txs(
 
     } // if (current_bc_status->search_thread_exist(xmr_address))
     else
-    {        
+    {
         j_response = json {{"status", "error"},
                            {"reason", "Search thread does not exist."}};
 
@@ -995,7 +995,7 @@ YourMoneroRequests::import_wallet_request(
     j_response["error"]  = "Some error occured";
 
     // if current_bc_status-> is zero, we just import the wallet.
-    // we dont care about any databases or anything, as importin all
+    // we dont care about any databases or anything, as importin
     // wallet is free.
     // just reset the scanned block height in mysql and finish.
     if (current_bc_status->get_bc_setup().import_fee == 0)
@@ -1003,7 +1003,8 @@ YourMoneroRequests::import_wallet_request(
         // change search blk number in the search thread
         if (!current_bc_status->set_new_searched_blk_no(xmr_address, 0))
         {
-            cerr << "Updating searched_blk_no failed!" << endl;
+            OMERROR << xmr_address.substr(0,6)
+                       + ": updating searched_blk_no failed!";
             j_response["error"] = "Updating searched_blk_no failed!";
         }
 
@@ -1016,7 +1017,7 @@ YourMoneroRequests::import_wallet_request(
 
         auto response_headers
                 = make_headers({{ "Content-Length",
-                                         std::to_string(response_body.size())}});
+                                 std::to_string(response_body.size())}});
 
         session->close( OK, response_body, response_headers);
 
@@ -1027,13 +1028,14 @@ YourMoneroRequests::import_wallet_request(
 
     if (!xmr_accounts->select(xmr_address, acc))
     {
-        cerr << "xmr_address does not exists! " << endl;
+        OMERROR << xmr_address.substr(0,6) +
+                   ": address does not exists!";
         j_response["error"] = "The account does not exists!";
 
         string response_body = j_response.dump();
         auto response_headers
                 = make_headers({{ "Content-Length",
-                                     std::to_string(response_body.size())}});
+                                 std::to_string(response_body.size())}});
 
         session->close( OK, response_body, response_headers);
         return;
@@ -1053,13 +1055,14 @@ YourMoneroRequests::import_wallet_request(
 
         if (xmr_payments.size() > 1)
         {
-            cerr << "More than one payment record found! " << endl;
+            OMERROR << xmr_address.substr(0,6) +
+                       "More than one payment record found!";
             j_response["error"] = "TMore than one payment record found!";
 
             string response_body = j_response.dump();
             auto response_headers
                     = make_headers({{ "Content-Length",
-                                      to_string(response_body.size())}});
+                                     to_string(response_body.size())}});
 
             session->close( OK, response_body, response_headers);
             return;
@@ -1122,7 +1125,8 @@ YourMoneroRequests::import_wallet_request(
                             if (!current_bc_status
                                     ->set_new_searched_blk_no(xmr_address, 0))
                             {
-                                cerr << "Updating searched_blk_no failed!\n";
+                                OMERROR << xmr_address.substr(0,6) +
+                                           ": updating searched_blk_no failed!\n";
                                 j_response["error"] = "Updating searched_blk_no"
                                                       " failed!";
                             }
@@ -1137,16 +1141,18 @@ YourMoneroRequests::import_wallet_request(
                     }
                     else
                     {
-                        cerr << "Updating accounts due to made "
-                                "payment mysql failed! \n";
+                        OMERROR << xmr_address.substr(0,6) +
+                                   ": updating accounts "
+                                   "payment db failed! \n";
                         j_response["error"]
-                                = "Updating accounts due to made "
-                                  "payment mysql failed!";
+                                = "Updating accounts "
+                                  "payment db failed!";
                     }
                 }
                 else
                 {
-                    cerr << "Updating payment mysql failed!\n";
+                    OMERROR << xmr_address.substr(0,6) +
+                               "Updating payment db failed!\n";
                     j_response["error"] = "Updating payment mysql failed!";
                 }
 
@@ -1974,6 +1980,3 @@ YourMoneroRequests::parse_request(
 }
 
 }
-
-
-

@@ -15,7 +15,7 @@ if (NOT ARQMA_DIR)
     set(ARQMA_DIR ~/arqma)
 endif()
 
-option(BUILD_TEST "Build tests for the project" OFF)
+option(BUILD_TESTS "Build tests for the project" OFF)
 
 message(STATUS ARQMA_DIR ": ${ARQMA_DIR}")
 
@@ -37,7 +37,7 @@ set(CMAKE_LIBRARY_PATH ${CMAKE_LIBRARY_PATH} "${ARQMA_BUILD_DIR}"
 include(MyUtils)
 
 
-if (${BUILD_TEST})
+if (${BUILD_TESTS})
     include(CodeCoverage)
     APPEND_COVERAGE_COMPILER_FLAGS()
     set(COVERAGE_EXCLUDES
@@ -49,7 +49,14 @@ endif()
 
 find_package(Arqma)
 
-include_directories(/usr/include/mysql)
+find_package(MYSQL)
+
+if (NOT MYSQL_INCLUDE_DIR)
+    message(SEND_ERROR "MySQL libraries not found! PLEASE install mysql++/mysqlpp libraries")
+    return()
+endif()
+
+include_directories(${MYSQL_INCLUDE_DIR})
 
 # include boost headers
 include_directories(${Boost_INCLUDE_DIRS})
@@ -161,7 +168,7 @@ set(LIBRARIES ${LIBRARIES} ${HIDAPI_LIBRARIES})
 target_link_libraries(${PROJECT_NAME} ${LIBRARIES})
 
 
-if (${BUILD_TEST})
+if (${BUILD_TESTS})
     include_directories(
         ${CMAKE_SOURCE_DIR}/ext/googletest/googletest/include
         ${CMAKE_SOURCE_DIR}/ext/googletest/googlemock/include)
@@ -169,7 +176,7 @@ endif()
 
 configure_files(${CMAKE_CURRENT_SOURCE_DIR}/sql ${CMAKE_CURRENT_BINARY_DIR}/sql)
 
-if (${BUILD_TEST})
+if (${BUILD_TESTS})
     enable_testing()
     add_subdirectory(ext/googletest)
     add_subdirectory(tests)

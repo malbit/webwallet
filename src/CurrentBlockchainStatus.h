@@ -25,7 +25,7 @@ namespace xmreg {
 
 using namespace std;
 
-class ArqAccount;
+class XmrAccount;
 class MySqlAccounts;
 
 
@@ -174,7 +174,7 @@ public:
     // definitions of these function are at the end of this file
     // due to forward declaraions of TxSearch
     virtual bool
-    start_tx_search_thread(ArqAccount acc,
+    start_tx_search_thread(XmrAccount acc,
                            std::unique_ptr<TxSearch> tx_search);
 
     virtual bool
@@ -184,7 +184,7 @@ public:
     search_thread_exist(const string& address);
 
     virtual bool
-    get_arq_address_viewkey(const string& address_str,
+    get_xmr_address_viewkey(const string& address_str,
                             address_parse_info& address,
                             secret_key& viewkey);
     virtual bool
