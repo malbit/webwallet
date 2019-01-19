@@ -62,6 +62,8 @@ TxSearch::operator()()
     uint64_t blocks_lookahead
             = current_bc_status->get_bc_setup().blocks_search_lookahead;
 
+    auto current_bc_status_ptr = current_bc_status.get();
+
     // we put everything in massive catch, as there are plenty ways in which
     // an exceptions can be thrown here. Mostly from mysql.
     // but because this is detatch thread, we cant catch them in main thread.
@@ -82,8 +84,17 @@ TxSearch::operator()()
 
             if (blocks.empty())
             {
-                OMINFO << "Cant get blocks from " << h1
-                       << " to " << h2;
+
+                if (h1 <= h2)
+                {
+                  OMERROR << "Can not get blocks from: " << h1
+                          << " to " << h2;
+                  stop();
+                }
+                else
+                {
+                  OMINFO << "Waiting for new block. Last scanned was: " << h2;
+                }
 
                 std::this_thread::sleep_for(
                         std::chrono::seconds(
@@ -170,7 +181,7 @@ TxSearch::operator()()
                 // and inputs in a given tx.
                 OutputInputIdentification oi_identification {
                             &address, &viewkey, &tx, tx_hash,
-                            is_coinbase, current_bc_status};
+                            is_coinbase};
 
                 // flag indicating whether the txs in the given block are spendable.
                 // this is true when block number is more than 10 blocks from current
@@ -350,7 +361,9 @@ TxSearch::operator()()
 
                 // no need mutex here, as this will be exectued only after
                 // the above. there is no threads here.
-                oi_identification.identify_inputs(known_outputs_keys);
+                oi_identification.identify_inputs(
+                  known_outputs_keys,
+                  current_bc_status_ptr);
 
 
                 if (!oi_identification.identified_inputs.empty())
@@ -610,8 +623,8 @@ TxSearch::get_current_timestamp() const
 void
 TxSearch::ping()
 {
-    OMINFO << "New last_ping_timestamp: "
-           << last_ping_timestamp.count();
+//    OMINFO << "New last_ping_timestamp: "
+//           << last_ping_timestamp.count();
 
     last_ping_timestamp = chrono::duration_cast<seconds>(
             chrono::system_clock::now().time_since_epoch());
@@ -659,6 +672,8 @@ TxSearch::find_txs_in_mempool(
     uint64_t current_height = current_bc_status
             ->get_current_blockchain_height();
 
+    auto current_bc_status_ptr = current_bc_status.get();
+
     known_outputs_t known_outputs_keys_copy = get_known_outputs_keys();
 
     // since find_txs_in_mempool can be called outside of this thread,
@@ -683,8 +698,7 @@ TxSearch::find_txs_in_mempool(
         // Class that is resposnible for idenficitaction of our outputs
         // and inputs in a given tx.
         OutputInputIdentification oi_identification
-                 {&address, &viewkey, &tx, tx_hash, coinbase,
-                 current_bc_status};
+                 {&address, &viewkey, &tx, tx_hash, coinbase};
 
         // FIRSt step. to search for the incoming xmr, we use address,
         // viewkey and
@@ -730,7 +744,8 @@ TxSearch::find_txs_in_mempool(
 
         // no need mutex here, as this will be exectued only after
         // the above. there is no threads here.
-        oi_identification.identify_inputs(known_outputs_keys_copy);
+        oi_identification.identify_inputs(known_outputs_keys_copy,
+                                          current_bc_status_ptr);
 
         if (!oi_identification.identified_inputs.empty())
         {

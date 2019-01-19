@@ -709,16 +709,6 @@ get_payment_id(const vector<uint8_t>& extra,
     return false;
 }
 
-
-bool
-get_payment_id(const transaction& tx,
-               crypto::hash& payment_id,
-               crypto::hash8& payment_id8)
-{
-    return get_payment_id(tx.extra, payment_id, payment_id8);
-}
-
-
 array<size_t, 5>
 timestamp_difference(uint64_t t1, uint64_t t2)
 {
@@ -1560,4 +1550,3 @@ populate_known_outputs_from_csv(
 
 
 }
-
