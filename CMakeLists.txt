@@ -23,7 +23,7 @@ set(ARQMA_SOURCE_DIR ${ARQMA_DIR}
         CACHE PATH "Path to the root directory for ARQMA")
 
 # set location of ARQMA build tree
-set(ARQMA_BUILD_DIR ${ARQMA_SOURCE_DIR}/build/Linux/release-v0.2.1/release/
+set(ARQMA_BUILD_DIR ${ARQMA_SOURCE_DIR}/build/Linux/release-v0.2.2/release/
         CACHE PATH "Path to the build directory for ARQMA")
 
 set(MY_CMAKE_DIR "${CMAKE_CURRENT_LIST_DIR}/cmake"
@@ -65,7 +65,7 @@ include_directories(${Boost_INCLUDE_DIRS})
 include_directories("ext/restbed/source")
 
 include_directories(
-    ${ARQMA_SOURCE_DIR}/build/Linux/release-v0.2.1
+    ${ARQMA_SOURCE_DIR}/build/Linux/release-v0.2.2
     /usr/local/include
     /usr/include/mysql
     /usr/local/opt/openssl/include
@@ -111,7 +111,6 @@ add_executable(${PROJECT_NAME}
 
 set(LIBRARIES
         myxrm
-        myext
         restbed
         wallet
         cryptonote_core

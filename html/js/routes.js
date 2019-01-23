@@ -31,37 +31,37 @@ thinwalletApp.config(function($routeProvider, $locationProvider) {
     //$locationProvider.html5Mode(false);
     $routeProvider
         .when('/', {
-            templateUrl: 'partials/home.html',
+            templateUrl: 'partials/home.html?1',
             controller: 'VersionCtrl',
             title: 'Welcome',
             redirectToAccount: true
         })
         .when('/overview', {
-            templateUrl: 'partials/account-overview.html',
+            templateUrl: 'partials/account-overview.html?3',
             controller: 'AccountOverviewCtrl',
             title: 'Overview',
             authenticated: true
         })
         .when('/transactions', {
-            templateUrl: 'partials/account-transactions.html',
+            templateUrl: 'partials/account-transactions.html?1',
             controller: 'TransactionsCtrl',
             title: 'Transactions',
             authenticated: true
         })
         .when('/send', {
-            templateUrl: 'partials/send-coins.html',
+            templateUrl: 'partials/send-coins.html?1',
             controller: 'SendCoinsCtrl',
             title: 'Send coins',
             authenticated: true
         })
         .when('/receive', {
-            templateUrl: 'partials/receive-coins.html',
+            templateUrl: 'partials/receive-coins.html?1',
             controller: 'ReceiveCoinsCtrl',
             title: 'Receive coins',
             authenticated: true
         })
         .when('/create-your-account', {
-            templateUrl: 'partials/create-your-account.html',
+            templateUrl: 'partials/create-your-account.html?2',
             controller: 'GenerateWalletCtrl',
             title: 'Create your account',
             redirectToAccount: true

@@ -25,8 +25,8 @@ var config = {
     txChargeRatio: 0.8,
     defaultMixin: 6, // minimum mixin for hardfork v7 is 6 (ring size 7)
     txChargeAddress: 'ar46iCiw5uB7SjnYhL5EJLP1LpqGkZbCcWhWgdbLL1c4DicNuYi3ZeRJPi8FFmEhYnagbxRyaQKyTYBA95JqmPcr1XZytK9o3',
-    idleTimeout: 300,
-    idleWarningDuration: 280,
+    idleTimeout: 20,
+    idleWarningDuration: 18,
     maxBlockNumber: 500000000,
     avgBlockTime: 120,
     debugMode: false

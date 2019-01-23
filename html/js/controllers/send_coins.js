@@ -122,7 +122,7 @@ thinwalletCtrls.controller('SendCoinsCtrl', function($scope, $http, $q,
             raw_tx: raw_tx,
             no_inputs: no_inputs,
             no_outputs: no_outputs,
-            txBlobKBytes: Math.round(txBlobKBytes*1e3) / 1e4,
+            txBlobKBytes: Math.round(txBlobKBytes*1e3) / 1e3,
             priority: priority_names[priority - 1],
             confirm: function() {
                 $scope.transferConfirmDialog = undefined;

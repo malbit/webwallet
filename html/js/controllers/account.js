@@ -161,7 +161,7 @@ thinwalletCtrls.controller('AccountCtrl', function($scope, $rootScope, $http, $q
                         $scope.account_scanned_block_height = data.scanned_block_height || 0;
                         $scope.account_scanned_block_timestamp = scanned_block_timestamp;
                         $scope.account_scan_start_height = data.start_height || 0;
-                        //$scope.transaction_height = data.transaction_height || 0;
+                        $scope.transaction_height = data.transaction_height || 0;
                         $scope.blockchain_height = data.blockchain_height || 0;
                     });
             }, function(response) {
@@ -267,7 +267,7 @@ thinwalletCtrls.controller('AccountCtrl', function($scope, $rootScope, $http, $q
                         transactions[i].timestamp = new Date(transactions[i].timestamp * 1000);
                     }
 
-                    transactions.sort(function(a, b)
+                    transactions.sort(function(a,b)
                     {
                         return b.id - a.id; // sort by id in database
 

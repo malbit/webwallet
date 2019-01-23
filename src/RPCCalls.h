@@ -22,7 +22,8 @@ using namespace std::chrono_literals;
 
 class RPCCalls
 {
-    string deamon_url;
+    string daemon_url;
+
     uint64_t timeout_time;
 
     chrono::seconds rpc_timeout;
@@ -37,11 +38,11 @@ class RPCCalls
 
 public:
 
-    RPCCalls(string _deamon_url = "http:://127.0.0.1:19994",
-             chrono::seconds _timeout = 3min + 30s);
+    RPCCalls(string _daemon_url = "http://127.0.0.1:19994",
+             chrono::seconds _timeout = 30min + 30s);
 
     virtual bool
-    connect_to_arqma_deamon();
+    connect_to_arqma_daemon();
 
     virtual bool
     commit_tx(const string& tx_blob,

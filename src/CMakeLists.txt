@@ -10,7 +10,7 @@ set(SOURCE_FILES
 		MySqlConnector.cpp
 		MySqlAccounts.cpp
 		ssqlses.cpp
-		YourMoneroRequests.cpp
+		ArqmaRequests.cpp
 		TxSearch.cpp
                 RPCCalls.cpp
 		OutputInputIdentification.cpp

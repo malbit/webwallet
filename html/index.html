@@ -19,7 +19,7 @@
     <link href="css_2/webflow.css" rel="stylesheet"/>
     <link href="css_2/moncrypt.webflow.css" rel="stylesheet"/>
 
-    <link rel="icon" href="./images/favicon.ico"/>
+    <link rel="icon" href="/images/favicon.ico"/>
 
     <!-- Add to home screen for Safari on iOS -->
     <meta name="apple-mobile-web-app-status-bar-style" content="black">
@@ -38,7 +38,7 @@
    <!-- <script src="bower_components/ngInfiniteScroll/build/ng-infinite-scroll.min.js"></script>-->
     <script src="bower_components/ng-idle/angular-idle.min.js"></script>
     <script src="bower_components/moment/min/moment-with-locales.min.js"></script>
-    <script src="js/FileSaver.min.js"></script>
+<!--    <script src="js/FileSaver.min.js"></script> -->
     <script src="js/webflow.js"></script>
 
     <script src="js/crc32.js?1"></script>
@@ -77,7 +77,7 @@
     <script src="js/directives/qr_code.js?1"></script>
     <script src="js/directives/modal.js?1"></script>
     <script src="js/directives/transaction.js?1"></script>
-<!--    <script src="js/directives/forms.js?1"></script> -->
+<!--    <script src="js/directives/forms.js?1"></script>-->
     <script src="js/routes.js?4"></script>
 </head>
 
@@ -99,7 +99,7 @@
                 </div>
                 <nav class="w-dropdown-list dropdown-rounded">
                     <a class="w-dropdown-link dropdown-styling pointer top" data-ix="display-login-key-review" show-modal="review-login-key">Review Login Key</a>
-<!--                    <a class="w-dropdown-link dropdown-styling pointer" show-modal="import-wallet" ng-hide="account_scan_start_height == 0">Import Transactions</a> -->
+                    <a class="w-dropdown-link dropdown-styling pointer" show-modal="import-wallet" ng-hide="account_scan_start_height == 0">Import Whole Wallet Transactions</a> 
                     <a class="w-dropdown-link dropdown-styling pointer" show-modal="imported-account">Import Transactions</a>
                     <a class="w-dropdown-link dropdown-styling pointer bottom" data-ix="display-review-account" show-modal="review-account-details">Account Details</a>
                 </nav>

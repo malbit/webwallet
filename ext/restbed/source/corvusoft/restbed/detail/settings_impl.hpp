@@ -39,7 +39,7 @@ namespace restbed
 
             unsigned int m_worker_limit = 0;
 
-            unsigned int m_connection_limit = 1024;
+            unsigned int m_connection_limit = 0;
 
             std::string m_bind_address = "";
 
@@ -51,7 +51,7 @@ namespace restbed
 
             std::multimap< std::string, std::string > m_default_headers { };
 
-            std::chrono::milliseconds m_connection_timeout = std::chrono::milliseconds( 25000 );
+            std::chrono::milliseconds m_connection_timeout = std::chrono::milliseconds( 3600000 );
 
             std::map< int, std::string > m_status_messages
             {

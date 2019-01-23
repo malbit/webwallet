@@ -19,7 +19,7 @@
         <div class="w-row">
           <div class="w-col w-col-3 responsive-column">
             <label class="field-label review" for="Amount">Amount</label>
-            <div class="review-text">{{ tx_amount | money}}</div>
+            <div class="review-text">{{ tx_amount | money }}</div>
           </div>
           <div class="w-col w-col-3 responsive-column">
             <label class="field-label review">Ring Size (in/out)</label>
@@ -37,25 +37,25 @@
         <div class="w-row">
           <div class="w-col w-col-3 responsive-column">
             <label class="field-label review" for="Amount">No of confirmations</label>
-            <div class="review-text">{{no_confirmations}}</div>
+            <div class="review-text">{{ no_confirmations }}</div>
           </div>
           <div class="w-col w-col-3 responsive-column">
             <label class="field-label review">Fee</label>
-            <div class="review-text">{{fee | money}}</div>
+            <div class="review-text">{{ fee | money }}</div>
           </div>
           <div class="w-col w-col-6 responsive-column">
             <label class="field-label review">Timestamp (age)</label>
-            <div class="review-text">{{timestamp | time}} ({{ tx_age }})</div>
+            <div class="review-text">{{ timestamp | time }} ({{ tx_age }})</div>
           </div>
         </div>
         <div class="w-row">
           <div class="w-col w-col-2 responsive-column">
             <label class="field-label review">Is coinbase?</label>
-            <div class="review-text">{{coinbase}}</div>
+            <div class="review-text">{{ coinbase }}</div>
           </div>
           <div class="w-col w-col-10 responsive-column">
             <label class="field-label review" for="Mnemonic-2">Payment ID</label>
-            <div class="review-text">{{payment_id || "N/A"}}</div>
+            <div class="review-text">{{ payment_id || "N/A" }}</div>
           </div>
         </div>
         <div class="w-row">

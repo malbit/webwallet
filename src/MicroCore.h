@@ -72,8 +72,7 @@ public:
                    vector<cryptonote::output_data_t>& outputs)
     {
         core_storage.get_db()
-                .get_output_key(epee::span<const uint64_t>(&amount, 1),
-                                absolute_offsets, outputs);
+                .get_output_key(amount, absolute_offsets, outputs);
     }
 
     virtual output_data_t
@@ -117,13 +116,10 @@ public:
         return core_storage.get_db().tx_exists(tx_hash, tx_id);
     }
 
-    virtual void
-    get_output_tx_and_index(
-      const uint64_t& amount,
-      const std::vector<uint64_t>& offsets,
-      std::vector<tx_out_index>& indices) const
+    virtual tx_out_index
+    get_output_tx_and_index(uint64_t const& amount, uint64_t const& index) const
     {
-        core_storage.get_db().get_output_tx_and_index(amount, offsets, indices);
+        return core_storage.get_db().get_output_tx_and_index(amount, index);
     }
 
     virtual uint64_t
@@ -206,7 +202,7 @@ public:
     virtual bool
     init_success() const;
 
-    virtual ~MicroCore();
+    virtual ~MicroCore() = default;
 };
 
 }

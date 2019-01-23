@@ -65,13 +65,13 @@ if (EXISTS ${ARQMA_BUILD_DIR}/src/ringct/libringct_basic.a)
 			PROPERTY IMPORTED_LOCATION ${ARQMA_BUILD_DIR}/src/ringct/libringct_basic.a)
 endif()
 
-message(STATUS ${ARQMA_SOURCE_DIR}/build/Linux/release-v0.2.1)
+message(STATUS ${ARQMA_SOURCE_DIR}/build/Linux/release-v0.2.2)
 
 # include Arqma headers
 include_directories(
 		${ARQMA_SOURCE_DIR}/src
 		${ARQMA_SOURCE_DIR}/external
-		${ARQMA_SOURCE_DIR}/build/Linux/release-v0.2.1
+		${ARQMA_SOURCE_DIR}/build/Linux/release-v0.2.2
 		${ARQMA_SOURCE_DIR}/external/easylogging++
 		${ARQMA_SOURCE_DIR}/contrib/epee/include
 		${ARQMA_SOURCE_DIR}/external/db_drivers/liblmdb)

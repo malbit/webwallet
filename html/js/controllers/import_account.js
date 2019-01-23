@@ -33,7 +33,7 @@ thinwalletCtrls.controller("ImportAccountCtrl", function($scope, $location,
     "use strict";
 
     $scope.success = '';
-    $scope.no_blocks_to_import = "1000";
+    $scope.no_blocks_to_import = "5000";
 
 
     // if we are import all tx from blockchain,
@@ -49,7 +49,7 @@ thinwalletCtrls.controller("ImportAccountCtrl", function($scope, $location,
     // as its much less complicated that importAll.
     $scope.importLast = function()
     {
-        if ($scope.no_blocks_to_import > 60000) {
+        if ($scope.no_blocks_to_import > 100000) {
             ModalService.hide('imported-account');
             return;
         }

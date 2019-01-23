@@ -34,7 +34,7 @@ thinwalletCtrls.controller('LatestTransactionsCtrl', function($scope, $http, $in
         $http.get(config.apiUrl + 'last_txs').success(function(data) {
             var transactions = data.transactions;
             for (var i = 0; i < transactions.length; ++i) {
-                transactions[i].timestamp = new Date(transactions[i].timestamp * 1000);
+                transactions[i].timestamp = new Date(transactions[i].timestamp);
             }
             $scope.transactions = transactions;
         });

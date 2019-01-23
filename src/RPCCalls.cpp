@@ -7,20 +7,20 @@
 namespace xmreg
 {
 
-RPCCalls::RPCCalls(string _deamon_url, chrono::seconds _timeout)
-    : deamon_url {_deamon_url}, rpc_timeout {_timeout}
+RPCCalls::RPCCalls(string _daemon_url, chrono::seconds _timeout)
+    : daemon_url {_daemon_url}, rpc_timeout {_timeout}
 {
-    epee::net_utils::parse_url(deamon_url, url);
+    epee::net_utils::parse_url(daemon_url, url);
 
     port = std::to_string(url.port);
 
     m_http_client.set_server(
-            deamon_url,
+            daemon_url,
             boost::optional<epee::net_utils::http::login>{});
 }
 
 bool
-RPCCalls::connect_to_arqma_deamon()
+RPCCalls::connect_to_arqma_daemon()
 {
     if(m_http_client.is_connected())
     {
@@ -48,8 +48,8 @@ RPCCalls::commit_tx(
         std::lock_guard<std::mutex> guard(m_daemon_rpc_mutex);
 
         r = epee::net_utils::invoke_http_json(
-          "/sendrawtransaction", req, res,
-          m_http_client, rpc_timeout);
+            "/sendrawtransaction", req, res,
+            m_http_client, rpc_timeout);
     }
 
     if (!r)
@@ -77,11 +77,11 @@ RPCCalls::commit_tx(
 
     if (res.status != CORE_RPC_STATUS_OK)
     {
-      error_msg = "Tx rejected: " + res.reason;
+        error_msg = "Tx rejected: " + res.reason;
 
-      cerr << "Error sending tx: " << error_msg << endl;
+        cerr << "Error sending tx: " << error_msg << endl;
 
-      return false;
+        return false;
     }
 
     if (do_not_relay)

@@ -15,7 +15,6 @@
 
 #include "arqma_headers.h"
 
-#include "../ext/format.h"
 #include "../ext/json.hpp"
 
 #include <boost/lexical_cast.hpp>
@@ -219,8 +218,8 @@ public_key
 get_tx_pub_key_from_received_outs(const transaction &tx);
 
 
-string
-xmr_amount_to_str(const uint64_t& xmr_amount, string format="{:0.9f}");
+//string
+//xmr_amount_to_str(const uint64_t& xmr_amount, string format="{:0.9f}");
 
 bool
 is_output_ours(const size_t& output_index,

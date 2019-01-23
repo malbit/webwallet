@@ -76,7 +76,7 @@ BlockchainSetup::get_blockchain_path()
         case network_type::MAINNET:
             blockchain_path = config_json["blockchain-path"]["mainnet"]
                     .get<string>();
-            deamon_url = config_json["daemon-url"]["mainnet"];
+            daemon_url = config_json["daemon-url"]["mainnet"];
             import_payment_address_str
                     = config_json["wallet_import"]["mainnet"]["address"];
             import_payment_viewkey_str
@@ -85,7 +85,7 @@ BlockchainSetup::get_blockchain_path()
         case network_type::TESTNET:
             blockchain_path = config_json["blockchain-path"]["testnet"]
                     .get<string>();
-            deamon_url = config_json["daemon-url"]["testnet"];
+            daemon_url = config_json["daemon-url"]["testnet"];
             import_payment_address_str
                     = config_json["wallet_import"]["testnet"]["address"];
             import_payment_viewkey_str
@@ -94,7 +94,7 @@ BlockchainSetup::get_blockchain_path()
         case network_type::STAGENET:
             blockchain_path = config_json["blockchain-path"]["stagenet"]
                     .get<string>();
-            deamon_url = config_json["daemon-url"]["stagenet"];
+            daemon_url = config_json["daemon-url"]["stagenet"];
             import_payment_address_str
                     = config_json["wallet_import"]["stagenet"]["address"];
             import_payment_viewkey_str
@@ -164,7 +164,7 @@ BlockchainSetup::_init()
             = config_json["blocks_search_lookahead"];
     max_number_of_blocks_to_import
             = config_json["max_number_of_blocks_to_import"];
-    search_thread_life_in
+    search_thread_life
             = seconds {config_json["search_thread_life_in_seconds"]};
     import_fee
             = config_json["wallet_import"]["fee"];

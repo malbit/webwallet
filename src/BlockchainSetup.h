@@ -35,7 +35,7 @@ public:
 
     string blockchain_path;
 
-    string deamon_url;
+    string daemon_url;
 
     network_type net_type;
 

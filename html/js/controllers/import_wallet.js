@@ -86,10 +86,14 @@ thinwalletCtrls.controller("ImportWalletCtrl", function($scope, $location, $http
                         $scope.success = "The wallet is being imported now or it has already been imported before.";
                     }
 
-                    $timeout(function(){ModalService.hide('import-wallet')}, 50000);
+                    $timeout(function(){ModalService.hide('import-wallet')}, 5000);
                 }
             },function(response) {
-                $scope.error = "Error connecting to the backend. Can't get payment import data.";
+                var data = response.data;
+                $scope.error = data && data.Error
+                        ? data.Error
+                        : "Something went wrong getting payment details";
+                //$scope.error = "Error connecting to the backend. Can't get payment import data.";
             });
     }
 

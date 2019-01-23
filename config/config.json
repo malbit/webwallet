@@ -19,7 +19,7 @@
     "url"      : "127.0.0.1",
     "port"     : 3306,
     "dbname"   : "arqma",
-    "user"     : "",
+    "user"     : "arqma",
     "password" : ""
   },
   "wallet_import" :
@@ -44,16 +44,16 @@
     }
   },
   "refresh_block_status_every_seconds" : 10,
-  "blocks_search_lookahead"            : 20,
-  "search_thread_life_in_seconds"      : 120,
+  "blocks_search_lookahead"            : 200,
+  "search_thread_life_in_seconds"      : 300,
   "max_number_of_blocks_to_import"     : 100000,
-  "mysql_ping_every_seconds"           : 300,
+  "mysql_ping_every_seconds"           : 200,
   "ssl" :
   {
     "enable" : false,
     "_comment": "below are example paths to crt and key files need to be given",
-    "ssl-key": "file:///home/webwallet/ssl_certs/server.key",
-    "ssl-crt": "file:///home/webwallet/ssl_certs/server.crt",
-    "dh-pem" : "file:///home/webwallet/ssl_certs/dh2048.pem"
+    "ssl-key": "file:///home/arqma/webwallet/ssl/server.key",
+    "ssl-crt": "file:///home/arqma/webwallet/ssl/server.crt",
+    "dh-pem" : "file:///home/arqma/webwallet/ssl/dh2048.pem"
   }
 }
