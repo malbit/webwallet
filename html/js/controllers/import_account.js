@@ -65,7 +65,7 @@ thinwalletCtrls.controller("ImportAccountCtrl", function($scope, $location,
 
                 if (data.request_fulfilled === true) {
                     $scope.success = "Request successful. Import will start shortly. This window will close in few seconds.";
-                    $timeout(function(){ModalService.hide('imported-account')}, 50000);
+                    $timeout(function(){ModalService.hide('imported-account')}, 2000);
                 }
                 else
                 {
