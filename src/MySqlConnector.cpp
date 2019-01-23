@@ -48,7 +48,7 @@ MySqlConnector::connect()
     }
     catch (mysqlpp::ConnectionFailed const& e)
     {
-        MYSQL_EXCEPTION_MSG(e, ((MySqlConnector*)nullptr));
+        MYSQL_EXCEPTION_MSG(e);
         return false;
     }
 
