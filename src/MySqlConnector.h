@@ -60,6 +60,9 @@ public:
 
     Query
     query(const std::string& qstr);
+         
+    virtual bool
+    connect();
 
     bool
     ping();
