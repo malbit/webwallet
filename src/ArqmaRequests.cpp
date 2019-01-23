@@ -573,9 +573,9 @@ ArqmaRequests::get_unspent_outs(
 
     string xmr_address;
     string view_key;
-    uint64_t mixin {4};
+    uint64_t mixin {6};
     bool use_dust {false};
-    uint64_t dust_threshold {1000000000};
+    uint64_t dust_threshold {10000};
     uint64_t amount {0};
 
     try

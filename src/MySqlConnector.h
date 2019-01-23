@@ -19,14 +19,10 @@ namespace xmreg
 using namespace mysqlpp;
 using namespace std;
 
-#define MYSQL_EXCEPTION_MSG(sql_excetp, sql_conn) do { \
-    cerr << "# ERR: SQLException in " << __FILE__ \
+#define MYSQL_EXCEPTION_MSG(sql_excetption) cerr << "# ERR: SQLException in " << __FILE__ \
          << "(" << __FUNCTION__ << ") on line " << __LINE__ << endl \
-         << "# ERR: " << sql_excetp.what() \
-         << endl; \
-    if (sql_conn && !sql_conn->connect(true)) throw std::runtime_error("Failed to reconnecting to MySQL after excemption"); \
-} while (false);
-
+         << "# ERR: " << sql_excetption.what() \
+         << endl;
 
 /*
  * This is that creates connections
@@ -64,9 +60,6 @@ public:
 
     Query
     query(const std::string& qstr);
-
-    virtual bool
-    connect(const bool force_reconnect = false);
 
     bool
     ping();
