@@ -44,14 +44,14 @@ namespace restbed
             std::string m_bind_address = "";
 
             bool m_case_insensitive_uris = true;
-            
+
             bool m_keep_alive = true;
-	
-	        uint32_t m_keep_alive_start = 1800;
-	
-	        uint32_t m_keep_alive_interval = 1800;
-	
-	        uint32_t m_keep_alive_cnt = 30;
+
+	          uint32_t m_keep_alive_start = 1800;
+
+	          uint32_t m_keep_alive_interval = 1800;
+
+	          uint32_t m_keep_alive_cnt = 30;
 
             std::map< std::string, std::string > m_properties { };
 

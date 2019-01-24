@@ -34,7 +34,7 @@ thinwalletCtrls.controller('LatestBlocksCtrl', function($scope, $http, $interval
         $http.get(config.apiUrl + 'last_blocks').success(function(data) {
             var blocks = data.blocks;
             for (var i = 0; i < blocks.length; ++i) {
-                blocks[i].timestamp = new Date(blocks[i].timestamp * 1000);
+                blocks[i].timestamp = new Date(blocks[i].timestamp);
             }
             $scope.blocks = blocks;
         });
