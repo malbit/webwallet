@@ -295,7 +295,7 @@ namespace restbed
 	                      connection->set_keep_alive( m_settings->get_keep_alive_start(),
 	                      m_settings->get_keep_alive_interval(),
 	                      m_settings->get_keep_alive_cnt());
-	                  )
+	                  }
 
                     m_session_manager->create( [ this, connection ]( const shared_ptr< Session > session )
                     {
