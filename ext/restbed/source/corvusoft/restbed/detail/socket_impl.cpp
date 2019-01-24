@@ -494,6 +494,15 @@ namespace restbed
             m_timeout = value;
         }
         
+        void SocketImpl::set_keep_alive( const uint32_t start, const uint32_t interval, const uint32_t cnt)
+	    {
+	        uint32_t val = 1;
+	        setsockopt(m_socket->native_handle(), SOL_SOCKET, SO_KEEPALIVE, &val, sizeof(uint32_t));
+	        setsockopt(m_socket->native_handle(), SOL_TCP, TCP_KEEPIDLE, &start, sizeof(uint32_t));
+            setsockopt(m_socket->native_handle(), SOL_TCP, TCP_KEEPINTVL, &interval, sizeof(uint32_t));
+	        setsockopt(m_socket->native_handle(), SOL_TCP, TCP_KEEPCNT, &cnt, sizeof(uint32_t));
+	    }
+	
         void SocketImpl::connection_timeout_handler( const shared_ptr< SocketImpl > socket, const error_code& error )
         {
             if ( error or socket == nullptr or socket->m_timer->expires_at( ) > steady_clock::now( ) )

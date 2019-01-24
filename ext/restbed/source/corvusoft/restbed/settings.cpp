@@ -73,6 +73,26 @@ namespace restbed
         return m_pimpl->m_connection_timeout;
     }
     
+    bool Settings::get_keep_alive ( void ) const
+	{
+	    return m_pimpl->m_keep_alive;
+	}
+	
+	uint32_t Settings::get_keep_alive_start ( void ) const
+	{
+	    return m_pimpl->m_keep_alive_start;
+	}
+	
+	uint32_t Settings::get_keep_alive_interval ( void ) const
+	{
+	    return m_pimpl->m_keep_alive_interval;
+	}
+	
+	uint32_t Settings::get_keep_alive_cnt ( void ) const
+	{
+	    return m_pimpl->m_keep_alive_cnt;
+	}
+    
     string Settings::get_status_message( const int code ) const
     {
         return ( m_pimpl->m_status_messages.count( code ) ) ?  m_pimpl->m_status_messages.at( code ) : "No Appropriate Status Message Found";
@@ -123,6 +143,26 @@ namespace restbed
         m_pimpl->m_connection_limit = value;
     }
     
+    void Settings::set_keep_alive( bool value )
+	{
+	    m_pimpl->m_keep_alive = value;
+	}
+	
+	void Settings::set_keep_alive_start( const uint32_t value )
+	{
+	    m_pimpl->m_keep_alive_start = value;
+	}
+	
+	void Settings::set_keep_alive_interval( const uint32_t value )
+	{
+	    m_pimpl->m_keep_alive_interval = value;
+	}
+	
+	void Settings::set_keep_alive_cnt( const uint32_t value )
+	{
+	    m_pimpl->m_keep_alive_cnt = value;
+	}
+	
     void Settings::set_bind_address( const string& value )
     {
         m_pimpl->m_bind_address = value;

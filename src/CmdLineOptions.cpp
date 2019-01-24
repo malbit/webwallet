@@ -16,7 +16,7 @@ namespace xmreg
         positional_options_description p;
 
         options_description desc(
-                "arqma, Open Monero backend service");
+                "Arqma Network backend service");
 
         desc.add_options()
                 ("help,h", value<bool>()->default_value(false)
@@ -33,7 +33,7 @@ namespace xmreg
                  "does not relay txs to other nodes. useful "
                  "when testing construction and submiting txs")
                 ("port,p", value<string>()->default_value("1984"),
-                 "default port for restbed service of Open Monero")
+                 "default port for restbed service of Arqma Webwallet")
                 ("config-file,c", value<string>()
                  ->default_value("./config/config.json"),
                  "Config file path.")
@@ -41,7 +41,7 @@ namespace xmreg
 		->default_value(1),
 		"Arqma log level 1-4, default is 1.")
                 ("log-file,l", value<string>()
-                 ->default_value("./openmonero.log"),
+                 ->default_value("./arqwallet.log"),
                  "Name and path to log file. -l \"\" to disable log file.");
 
 

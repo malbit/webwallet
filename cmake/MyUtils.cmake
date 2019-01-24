@@ -64,6 +64,7 @@ endmacro(create_git_version)
 macro(resource_dir srcDir)
     # Scan through resource folder for updated files and copy if none existing or changed
     file (GLOB_RECURSE resources "${srcDir}/*.*")
+    
     foreach(resource ${resources})
         get_filename_component(filename ${resource} NAME)
         get_filename_component(dir ${resource} DIRECTORY)
@@ -71,7 +72,7 @@ macro(resource_dir srcDir)
 
         set(topdir ${dirname})
 
-        set (output "")
+        set(output "")
 
         while(NOT ${dirname} STREQUAL ${srcDir})
             get_filename_component(path_component ${dir} NAME)
@@ -90,7 +91,7 @@ macro(resource_dir srcDir)
                 ${resource}
                 ${output}
         )
-        add_custom_target(${filename} ALL DEPENDS ${resource} ${output})
+        add_custom_target("${dirname}${filename}" ALL DEPENDS ${resource} ${output})
 
     endforeach()
 endmacro(resource_dir)
