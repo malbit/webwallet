@@ -8,8 +8,6 @@ Group=arqma
 WorkingDirectory=~
 RuntimeDirectory=webwallet
 
-# Clearnet config
-#
 Type=forking
 ExecStart=/home/arqma/webwallet/build/arqwallet
 
