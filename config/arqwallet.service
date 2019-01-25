@@ -1,0 +1,19 @@
+[Unit]
+Description=Arqma Web-Wallet Backend
+After=network.target
+
+[Service]
+User=arqma
+Group=arqma
+WorkingDirectory=~
+RuntimeDirectory=webwallet
+
+# Clearnet config
+#
+Type=forking
+ExecStart=/home/arqma/webwallet/build/arqwallet
+
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
