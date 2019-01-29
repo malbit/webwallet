@@ -72,8 +72,7 @@ public:
                    vector<cryptonote::output_data_t>& outputs)
     {
         core_storage.get_db()
-                .get_output_key(epee::span<const uint64_t>(&amount, 1), 
-                                absolute_offsets, outputs);
+                .get_output_key(amount, absolute_offsets, outputs);
     }
 
     virtual output_data_t
