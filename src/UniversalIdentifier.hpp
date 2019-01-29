@@ -18,7 +18,7 @@ public:
     virtual void identify(transaction const& tx,
                           public_key const& tx_pub_key,
                           vector<public_key> const& additional_tx_pub_keys
-	                                = vector<public_key>{}) = 0;
+                                = vector<public_key>{}) = 0;
 };
 
 
@@ -34,7 +34,7 @@ public:
     virtual void identify(transaction const& tx,
                           public_key const& tx_pub_key,
                           vector<public_key> const& additional_tx_pub_keys
-	                                = vector<public_key>{}) = 0;
+                                = vector<public_key>{}) = 0;
 
     inline auto get_address() const {return address_info;}
     inline auto get_viewkey() const {return viewkey;}
@@ -43,17 +43,17 @@ public:
     virtual ~BaseIdentifier() = default;
 
 protected:
-
     address_parse_info const* address_info {nullptr};
     secret_key const* viewkey {nullptr};
     uint64_t total_xmr {0};
 };
 
-
-
+/**
+ * @brief The Output class identifies our
+ * outputs in a given tx
+ */
 class Output : public BaseIdentifier
 {
-
 public:
 
     Output(address_parse_info const* _address,
@@ -64,75 +64,87 @@ public:
     void identify(transaction const& tx,
                   public_key const& tx_pub_key,
                   vector<public_key> const& additional_tx_pub_keys
-	                        = vector<public_key>{}) override;
+                        = vector<public_key>{}) override;
 
     inline auto get() const
     {
         return identified_outputs;
     }
 
-protected:
-
     struct info
     {
         public_key pub_key;
         uint64_t   amount;
-	    uint64_t   idx_in_tx;
-	    key_derivation derivation;
-	    rct::key   rtc_outpk;
-	    rct::key   rtc_mask;
-	    rct::key   rtc_amount;
-	    
-	    friend std::ostream& operator<<(std::ostream& os, info const& _info)
-	};
+        uint64_t   idx_in_tx;
+        key_derivation derivation;
+        rct::key   rtc_outpk;
+        rct::key   rtc_mask;
+        rct::key   rtc_amount;
+
+        friend std::ostream& operator<<(std::ostream& os, info const& _info);
+    };
+
+protected:
 
     uint64_t total_received {0};
     vector<info> identified_outputs;
 };
 
+/**
+ * @brief The Input class identifies our possible
+ * inputs (key images) in a given tx
+ */
 class Input : public BaseIdentifier
-
-public:
-	
-	    using known_outputs_t = unordered_map<public_key, uint64_t>;
-	
-	    Input(address_parse_info const* _a,
-	           secret_key const* _viewkey,
-	           known_outputs_t const* _known_outputs,
-	           MicroCore* _mcore)
-	        : BaseIdentifier(_a, _viewkey),          
-	          known_outputs {_known_outputs},
-	          mcore {_mcore}
-	    {}
-	
-	    void identify(transaction const& tx,
-	                  public_key const& tx_pub_key,
-	                  vector<public_key> const& additional_tx_pub_keys
-	                        = vector<public_key>{}) override;
-	
-	    inline auto get() const
-	    {
-	        return identified_inputs;
-	    }
-	
-protected:
-
 {
+public:
+                                        //output_pubk   , amount
+    using known_outputs_t = unordered_map<public_key, uint64_t>;
+
+    Input(address_parse_info const* _a,
+           secret_key const* _viewkey,
+           known_outputs_t const* _known_outputs,
+           MicroCore* _mcore)
+        : BaseIdentifier(_a, _viewkey),          
+          known_outputs {_known_outputs},
+          mcore {_mcore}
+    {}
+
+    void identify(transaction const& tx,
+                  public_key const& tx_pub_key,
+                  vector<public_key> const& additional_tx_pub_keys
+                        = vector<public_key>{}) override;
+
+    inline auto get() const
+    {
+        return identified_inputs;
+    }
+
+
     struct info
     {
         key_image key_img;
         uint64_t amount;
         public_key out_pub_key;
-        
+
         friend std::ostream& operator<<(std::ostream& os, info const& _info);
     };
-    
-    secret_key const* viewkey {nullptr};
-    known_outputs_t const* known_outputs {nullptr};    
-	MicroCore* mcore {nullptr};
-	vector<info> identified_inputs;
+
+
+protected:
+
+    secret_key const* viewkey {nullptr};   
+    known_outputs_t const* known_outputs {nullptr};
+    MicroCore* mcore {nullptr};
+    vector<info> identified_inputs;
 };
 
+/**
+ * Spendkey is optional. But if we have it,
+ * we can for sure determine which key images
+ * are ours or not. This is especially useful
+ * in unit testing, since we can compare wether
+ * guessed key images do contain all our key images
+ */
 class RealInput : public Input
 {
 
@@ -149,10 +161,11 @@ public:
     void identify(transaction const& tx,
                   public_key const& tx_pub_key,
                   vector<public_key> const& additional_tx_pub_keys
-	                        = vector<public_key>{}) override;
+                        = vector<public_key>{}) override;
+
 
 protected:
-	secret_key const* spendkey {nullptr};
+    secret_key const* spendkey {nullptr};
 };
 
 
@@ -170,7 +183,7 @@ public:
     void identify(transaction const& tx,
                   public_key const& tx_pub_key,
                   vector<public_key> const& additional_tx_pub_keys
-	                        = vector<public_key>{}) override
+                        = vector<public_key>{}) override
     {   
         cout << "PaymentID decryption: "
                 + pod_to_hex(payment_id) << endl;
@@ -181,6 +194,7 @@ public:
 
         payment_id = std::get<HashT>(payment_id_tuple);
 
+        // if no payment_id found, return
         if (payment_id == null_hash)
             return;
 
@@ -233,7 +247,13 @@ public:
         : identifiers {move(args)...},
           tx {_tx}
     {
+        // having tx public key is very common for all identifiers
+        // so we can get it here, instead of just obtaining it
+        // for each identifier seprately
         tx_pub_key = get_tx_pub_key_from_received_outs(tx);
+
+        // multi-output txs can have some additional public keys
+        // in the extra field. So we also get them, just in case
         additional_tx_pub_keys = get_additional_tx_pub_keys_from_extra(tx);
     }
 
@@ -241,22 +261,25 @@ public:
     {
          auto b = {(std::get<unique_ptr<T>>(
                         identifiers)->identify(
-                        tx, tx_pub_key, additional_tx_pub_keys),
+                            tx, tx_pub_key, additional_tx_pub_keys),
                    true)...};
          (void) b;
     }
 
+     // overload to get value from tuple by type
     template <typename U>
     auto* const get()
     {
         return std::get<unique_ptr<U>>(identifiers).get();
     }
-    
+
+
+    // overload to get value from tuple by number
     template <size_t No>
-	auto* const get()
-	{
-	    return std::get<No>(identifiers).get();
-	}
+    auto* const get()
+    {
+        return std::get<No>(identifiers).get();
+    }
 
     inline auto get_tx_pub_key() const {return tx_pub_key;}
 
@@ -266,7 +289,9 @@ private:
     vector<public_key> additional_tx_pub_keys;
 };
 
-
+/**
+ * A helper function to create ModularIdentifier object
+ */
 template<typename... T>
 auto make_identifier(transaction const& tx, T&&... identifiers)
 {
@@ -278,28 +303,29 @@ template <typename T>
 auto
 calc_total_xmr(T&& infos)
 {
-	uint64_t total_xmr {0};
-	
-	for (auto const& info: infos)
-	    total_xmr += info.amount;
-	
-	return total_xmr;
+    uint64_t total_xmr {0};
+
+    for (auto const& info: infos)
+        total_xmr += info.amount;
+
+    return total_xmr;
 }
+
 
 inline std::ostream&
 operator<<(std::ostream& os, xmreg::Output::info const& _info)
 {
-	return os << _info.idx_in_tx << ", "
-	          << pod_to_hex(_info.pub_key) << ", "
-	          << _info.amount;
+    return os << _info.idx_in_tx << ", "
+              << pod_to_hex(_info.pub_key) << ", "
+              << _info.amount;
 }
 
 inline std::ostream&
 operator<<(std::ostream& os, xmreg::Input::info const& _info)
 {
-	return os << pod_to_hex(_info.key_img) << ", "
-	          << pod_to_hex(_info.out_pub_key) << ", "
-	          << _info.amount;
+    return os << pod_to_hex(_info.key_img) << ", "
+              << pod_to_hex(_info.out_pub_key) << ", "
+              << _info.amount;
 }
 
 }
