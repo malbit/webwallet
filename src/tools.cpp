@@ -824,8 +824,8 @@ decode_ringct(const rct::rctSig& rv,
               const crypto::public_key &pub,
               const crypto::secret_key &sec,
               unsigned int i,
-              rct::key & mask,
-              uint64_t & amount)
+              rct::key& mask,
+              uint64_t& amount)
 {
     crypto::key_derivation derivation;
 
@@ -1144,7 +1144,7 @@ make_tx_from_json(const string& json_str, transaction& tx)
 
             vector<signature> sig_split;
 
-            auto split_sig = [&](string::iterator &b, string::iterator &e)
+            auto split_sig = [&](string::iterator& b, string::iterator& e)
             {
                 signature a_sig;
 

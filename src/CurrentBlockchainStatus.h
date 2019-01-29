@@ -85,14 +85,14 @@ public:
                         = TxUnlockChecker());
 
     virtual bool
-    get_block(uint64_t height, block &blk);
+    get_block(uint64_t height, block& blk);
 
     virtual vector<block>
     get_blocks_range(uint64_t const& h1, uint64_t const& h2);
 
     virtual bool
-    get_block_txs(const block &blk,
-                  vector<transaction> &blk_txs,
+    get_block_txs(const block& blk,
+                  vector<transaction>& blk_txs,
                   vector<crypto::hash>& missed_txs);
 
     virtual bool

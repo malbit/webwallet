@@ -42,7 +42,7 @@ public:
     bool do_not_relay {false};
 
     seconds refresh_block_status_every {10};
-    seconds search_thread_life {120};
+    seconds search_thread_life {300};
     seconds mysql_ping_every {300};
 
     uint64_t blocks_search_lookahead {200};

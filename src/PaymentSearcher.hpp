@@ -29,9 +29,9 @@ class PaymentSearcher
 public:
     PaymentSearcher(
             address_parse_info const& _address_info,
-            secret_key const& _viewkey):
-          address_info {_address_info},
-          viewkey {_viewkey}
+            secret_key const& _viewkey)
+      : address_info {_address_info},
+        viewkey {_viewkey}
     {}
 
 

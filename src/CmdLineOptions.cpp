@@ -16,7 +16,7 @@ namespace xmreg
         positional_options_description p;
 
         options_description desc(
-                "Arqma Network backend service");
+                "Arq-Net Wallet Web-Interface backend service");
 
         desc.add_options()
                 ("help,h", value<bool>()->default_value(false)

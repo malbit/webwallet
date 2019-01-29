@@ -25,7 +25,7 @@ public:
 
     MysqlPing(std::shared_ptr<MySqlConnector> _conn,
               seconds _ping_time = 300s,
-	      seconds _sleep_time = 5s);
+	          seconds _sleep_time = 5s);
 
     void operator()();
     void stop() {keep_looping = false;}
