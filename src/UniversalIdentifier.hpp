@@ -43,6 +43,7 @@ public:
     virtual ~BaseIdentifier() = default;
 
 protected:
+
     address_parse_info const* address_info {nullptr};
     secret_key const* viewkey {nullptr};
     uint64_t total_xmr {0};
@@ -70,8 +71,7 @@ public:
         return identified_outputs;
     }
 
-protcted:
-
+protected:
 
     struct info
     {
