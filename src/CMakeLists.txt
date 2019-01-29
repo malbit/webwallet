@@ -12,14 +12,14 @@ set(SOURCE_FILES
 		ssqlses.cpp
 		ArqmaRequests.cpp
 		TxSearch.cpp
-                RPCCalls.cpp
+        RPCCalls.cpp
 		OutputInputIdentification.cpp
 		version.h.in
 		BlockchainSetup.cpp
 		ThreadRAII.cpp
-                MysqlPing.cpp
-                TxUnlockChecker.cpp
-                RandomOutputs.cpp)
+        MysqlPing.cpp
+        TxUnlockChecker.cpp
+        RandomOutputs.cpp)
 
 # make static library called libmyxrm
 # that we are going to link to

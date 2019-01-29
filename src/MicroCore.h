@@ -148,7 +148,16 @@ public:
     {
         return core_storage.get_current_blockchain_height();
     }
-
+    
+    virtual void
+	get_output_tx_and_index(
+	        const uint64_t& amount,
+	        const std::vector<uint64_t>& offsets,
+	        std::vector<tx_out_index>& indices) const
+	{
+	    core_storage.get_db().get_output_tx_and_index(
+	                    amount, offsets, indices);
+    }
 
     virtual bool
     get_output_histogram(

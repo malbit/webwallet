@@ -51,6 +51,8 @@ class OutputInputIdentification
 
 public:
 
+    enum class INTERNAL_STATUS {FAIL, OK, CANT_DERIVE_KEY};
+
     // define a structure to keep information about found
     // outputs that we can need in later parts.
     struct output_info
@@ -99,6 +101,8 @@ public:
 
     vector<output_info> identified_outputs;
     vector<input_info>  identified_inputs;
+    
+    INTERNAL_STATUS status = INTERNAL_STATUS::FAIL;
 
     // default constructor. Useful for unit tests
     OutputInputIdentification() = default;
@@ -108,6 +112,8 @@ public:
                               const transaction* _tx,
                               crypto::hash const& _tx_hash,
                               bool is_coinbase);
+
+
 
     /**
      * FIRST step. search for the incoming xmr using address, viewkey and
