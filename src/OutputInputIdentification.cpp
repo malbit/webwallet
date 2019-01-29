@@ -19,7 +19,7 @@ OutputInputIdentification::OutputInputIdentification(
     viewkey = _v;
     tx = _tx;
 
-    tx_pub_key  = xmreg::get_tx_pub_key_from_received_outs(*tx);
+    tx_pub_key = xmreg::get_tx_pub_key_from_received_outs(*tx);
 
     tx_is_coinbase = is_coinbase;
     tx_hash = _tx_hash;
@@ -107,14 +107,14 @@ OutputInputIdentification::identify_outputs()
                 // go to CurrentBlockchainStatus::construct_output_rct_field
                 // to see how we deal with coinbase ringct that are used
                 // as mixins
-                rtc_outpk  = pod_to_hex(tx->rct_signatures
+                rtc_outpk = pod_to_hex(tx->rct_signatures
                                         .outPk[output_idx_in_tx].mask);
-                rtc_mask   = pod_to_hex(tx->rct_signatures
+                rtc_mask = pod_to_hex(tx->rct_signatures
                                         .ecdhInfo[output_idx_in_tx].mask);
                 rtc_amount = pod_to_hex(tx->rct_signatures
                                         .ecdhInfo[output_idx_in_tx].amount);
 
-                rct::key mask =  tx->rct_signatures
+                rct::key mask = tx->rct_signatures
                         .ecdhInfo[output_idx_in_tx].mask;
 
                 r = decode_ringct(tx->rct_signatures,

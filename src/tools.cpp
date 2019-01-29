@@ -44,6 +44,7 @@ parse_str_secret_key(const string& key_str, T& secret_key)
 template bool parse_str_secret_key<crypto::secret_key>(const string& key_str, crypto::secret_key& secret_key);
 template bool parse_str_secret_key<crypto::public_key>(const string& key_str, crypto::public_key& secret_key);
 template bool parse_str_secret_key<crypto::hash>(const string& key_str, crypto::hash& secret_key);
+template bool parse_str_secret_key<crypto::hash8>(const string& key_str, crypto::hash8& secret_key);
 
 /**
  * Get transaction tx using given tx hash. Hash is represent as string here,
@@ -201,7 +202,7 @@ generate_key_image(const crypto::key_derivation& derivation,
                                    pub_key,
                                    in_ephemeral.pub))
     {
-        cerr << "Error generating publick key " << pub_key << endl;
+        cerr << "Error generating public key " << pub_key << endl;
         return false;
     }
 
@@ -827,7 +828,7 @@ decode_ringct(const rct::rctSig& rv,
                                               hw::get_device("default"));
                 break;
             case rct::RCTTypeFull:
-	    case rct::RCTTypeFullBulletproof:
+	          case rct::RCTTypeFullBulletproof:
                 amount = rct::decodeRct(rv,
                                         rct::sk2rct(scalar1),
                                         i,
