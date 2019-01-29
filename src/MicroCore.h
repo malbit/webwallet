@@ -43,7 +43,7 @@ public:
     //   <amoumt,
     //    tuple<total_instances, unlocked_instances, recent_instances>
     using histogram_map = std::map<uint64_t,
-                               std::tuple<uint64_t,  uint64_t, uint64_t>>;
+                               std::tuple<uint64_t, uint64_t, uint64_t>>;
 
     MicroCore();
 
@@ -67,12 +67,13 @@ public:
     get_device() const;
 
     virtual void
-    get_output_key(uint64_t& amount,
+    get_output_key(uint64_t amount,
                    vector<uint64_t> const& absolute_offsets,
                    vector<cryptonote::output_data_t>& outputs)
     {
         core_storage.get_db()
-                .get_output_key(amount, absolute_offsets, outputs);
+                .get_output_key(epee::span<const uint64_t>(&amount, 1), 
+                                absolute_offsets, outputs);
     }
 
     virtual output_data_t
