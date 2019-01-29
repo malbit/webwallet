@@ -24,7 +24,7 @@ OutputInputIdentification::OutputInputIdentification(
     tx_is_coinbase = is_coinbase;
     tx_hash = _tx_hash;
 
-    is_rct = (tx->version >= 2);
+    is_rct = (tx->version == 2);
 
     if (is_rct)
     {
@@ -35,8 +35,8 @@ OutputInputIdentification::OutputInputIdentification(
     if (!generate_key_derivation(tx_pub_key, *viewkey, derivation))
     {
         OMERROR << "Cant get derived key for: "  << "\n"
-             << "pub_tx_key: " << get_tx_pub_key_str() << " and "
-             << "prv_view_key" << viewkey;;
+                << "pub_tx_key: " << get_tx_pub_key_str() << " and "
+                << "prv_view_key: " << viewkey;
 
         throw OutputInputIdentificationException(
                     "Cant get derived key for a tx");
@@ -86,7 +86,7 @@ OutputInputIdentification::identify_outputs()
 
         // if mine output has RingCT, i.e., tx version is 2
         // need to decode its amount. otherwise its zero.
-        if (mine_output && tx->version >= 2)
+        if (mine_output && tx->version == 2)
         {
             // initialize with regular amount value
             // for ringct, except coinbase, it will be 0

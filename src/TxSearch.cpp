@@ -93,15 +93,15 @@ TxSearch::operator()()
                 if (h1 <= h2)
                 {
                   OMERROR << address_prefix
-			  << + ": can't get blocks from: " << h1
+                          << + ": can't get blocks from: " << h1
                           << " to " << h2;
                   stop();
                 }
                 else
                 {
                   OMINFO << address_prefix
-			 << + ": waiting for new block. "
-			    "Last scanned was: " << h2;
+                         << + ": waiting for new block. "
+                              "Last scanned was: " << h2;
                 }
 
                 std::this_thread::sleep_for(
@@ -118,7 +118,7 @@ TxSearch::operator()()
                 if (loop_timestamp - last_ping_timestamp > thread_search_life)
                 {
                     OMINFO << address_prefix
-			      + ": search thread stopped.";
+                              + ": search thread stopped.";
                     stop();
                 }
 
@@ -135,7 +135,7 @@ TxSearch::operator()()
                 continue;
             }
 
-            OMINFO << address_prefix + ": analyzing " 
+            OMINFO << address_prefix + ": analyzing "
                    << blocks.size() << " blocks from "
                    << h1 << " to " << h2
                    << " out of " << last_block_height << " blocks";
@@ -150,8 +150,8 @@ TxSearch::operator()()
                                                       txs_data))
             {
                 OMERROR << address_prefix
-                           + ": can't get tx in blocks from " 
-			<< h1 << " to " << h2;
+                           + ": can't get tx in blocks from "
+                        << h1 << " to " << h2;
                 return;
             }
 
@@ -267,8 +267,8 @@ TxSearch::operator()()
                     }
 
                     OMINFO << address_prefix
-			      + ": found some outputs in block "
-			   << blk_height << ", tx: " 
+                              + ": found some outputs in block "
+                           << blk_height << ", tx: "
                            << oi_identification.get_tx_hash_str();
 
 
@@ -313,7 +313,7 @@ TxSearch::operator()()
                             tx_hash, amount_specific_indices))
                     {
                         OMERROR << address_prefix
-				   + ": can't get_amount_specific_indices!";
+                                   + ": can't get_amount_specific_indices!";
                         throw TxSearchException(
                                     "cant get_amount_specific_indices!");
                     }
@@ -321,7 +321,7 @@ TxSearch::operator()()
                     if (tx_mysql_id == 0)
                     {
                         OMERROR << address_prefix
-				   + ": tx_mysql_id is zero!"
+                                   + ": tx_mysql_id is zero!"
                                 << tx_data;
                         throw TxSearchException("tx_mysql_id is zero!");
                     }
@@ -889,7 +889,7 @@ TxSearch::delete_existing_tx_if_exists(string const& tx_hash)
     if (xmr_accounts->tx_exists(acc->id.data, tx_hash, tx_data_existing))
     {
         OMINFO << '\n' << address_prefix
-		  + ": tx " << tx_hash
+		              + ": tx " << tx_hash
                << " already present in mysql, so remove it";
 
         // if tx is already present for that user,
@@ -898,7 +898,7 @@ TxSearch::delete_existing_tx_if_exists(string const& tx_hash)
         if (xmr_accounts->delete_tx(tx_data_existing.id.data) == 0)
         {
             OMERROR << address_prefix + ": can't remove tx "
-		    << tx_hash;
+		                << tx_hash;
             return false;
         }
     }
