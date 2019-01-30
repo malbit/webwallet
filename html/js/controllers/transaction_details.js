@@ -79,14 +79,14 @@ thinwalletCtrls.controller('TransactionDetailsCtrl', function($scope,
             $scope.fee              = data.fee;
             $scope.tx_size          = (data.size / 1024).toFixed(4);
             $scope.no_confirmations = data.no_confirmations === -1 ? "tx in mempool" : data.no_confirmations;
-            $scope.tx_height        = data.tx_height === -1 ? "N.A" :data.tx_height;
+            $scope.tx_height        = data.tx_height === -1 ? "N.A" : data.tx_height;
             $scope.tx_pub_key       = data.pub_key;
             $scope.coinbase         = data.coinbase;
-            $scope.timestamp        = new Date(data.timestamp);
+            $scope.timestamp        = new Date(data.timestamp * 1000);
             $scope.no_outputs       = data.num_of_outputs;
             $scope.no_inputs        = data.num_of_inputs;
 
-            var age_duration = moment.duration(new Date() - new Date(data.timestamp));
+            var age_duration = moment.duration(new Date() - new Date(data.timestamp * 1000));
 
             $scope.tx_age = age_duration.humanize();
 

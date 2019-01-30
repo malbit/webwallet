@@ -5,8 +5,10 @@
         <div class="close-overlay pointer" data-ix="close-overlay">+</div>
       </a>
       <h1 class="head-modal">Transaction details</h1>
-      <div class="subhead-text modal review" style="margin-bottom: 10px;overflow: auto;">{{ tx_hash }}</div>
-
+      <div class="move-text-div">
+        <div class="subhead-text modal review" style="margin-bottom: 10px">{{ tx_hash }}</div>
+      </div>
+      
       <div class="w-form form-wrapper" ng-show="fetching">
         <div class="w-row">
           <div class="w-col w-col-12 responsive-column">
@@ -60,14 +62,16 @@
         </div>
         <div class="w-row">
           <div class="w-col w-col-12 responsive-column">
-            <label class="field-label review" for="Mnemonic-2">View in a blockchain explorer for even more details</label>
-            <a class="login-link" style="overflow: auto;" href="{{ explorerLink }} " target="_blank">{{ explorerLink }} </a>
+            <div class="move-text-div">
+              <label class="field-label review" for="Mnemonic-2">View in a blockchain explorer for even more details</label>
+              <a class="login-link" href="{{ explorerLink }} " target="_blank">{{ explorerLink }} </a>
+            </div>
           </div>
         </div>
       </div>
       <br/>
       <div class="w-form-fail error-backing" style="display: block;" ng-show="!!error">
-        <p>{{error}}</p>
+        <p>{{ error }}</p>
       </div>
     </div>
   </div>
