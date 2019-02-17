@@ -8,8 +8,7 @@
       <div class="w-form form-wrapper">
         <label class="field-label">Import all transactions</label>
         <div class="review-text">This will scan all blocks in the blockchain.
-          This is very resource intensive task.
-          Thus a small fee might be required (depends on the backend settings).</div>
+          This is very resource intensive task.</div>
         <div class="submit-div small-top-margin">
           <a class="login-btn modals pointer" ng-click="importAll()">Import all transactions</a>
         </div>
@@ -36,10 +35,10 @@
           <a class="login-btn modals pointer" hide-modal="">Don't import transactions</a>
         </div>
         <div class="w-form-fail error-backing" style="display: block;" ng-show="!!error">
-            <p>{{error}}</p>
+            <p>{{ error }}</p>
         </div>
         <div class="w-form-done success-backing" style="display: block;" ng-show="!!success">
-          <p>{{success}}</p>
+          <p>{{ success }}</p>
         </div>
       </div>
     </div>

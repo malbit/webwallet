@@ -770,7 +770,7 @@ ArqmaRequests::get_unspent_outs(
     auto response_headers = make_headers({{ "Content-Length",
                                             to_string(response_body.size())}});
 
-    session->close(OK, response_body, response_headers);
+    session->close( OK, response_body, response_headers);
 }
 
 void
@@ -881,7 +881,7 @@ ArqmaRequests::get_random_outs(
     auto response_headers = make_headers({{ "Content-Length",
                                             to_string(response_body.size())}});
 
-    session->close(OK, response_body, response_headers);
+    session->close( OK, response_body, response_headers);
 }
 
 
@@ -1185,7 +1185,7 @@ ArqmaRequests::import_wallet_request(
         if (!xmr_accounts->update(*xmr_payment, updated_xmr_payment))
         {
 
-            OMERROR << xmr_address.substr(0,6) +
+            OMERROR << xmr_address.substr(0, 6) +
                         "Updating payment db failed!\n";
 
             session_close(session, j_response, UNPROCESSABLE_ENTITY,
@@ -1202,7 +1202,7 @@ ArqmaRequests::import_wallet_request(
 
         if (!xmr_accounts->update(*xmr_account, updated_acc))
         {
-            OMERROR << xmr_address.substr(0,6) +
+            OMERROR << xmr_address.substr(0, 6) +
                         "Updating scanned_block_height failed!\n";
 
             session_close(session, j_response, UNPROCESSABLE_ENTITY,
@@ -1377,7 +1377,7 @@ ArqmaRequests::get_tx(
     json j_response;
     json j_request;
 
-    vector<string> requested_values {"address" , "view_key", "tx_hash"};
+    vector<string> requested_values {"address" , "view_key" , "tx_hash"};
 
     if (!parse_request(body, requested_values, j_request, j_response))
     {
@@ -1731,7 +1731,7 @@ ArqmaRequests::get_tx(
     auto response_headers = make_headers({{ "Content-Length",
                                             to_string(response_body.size())}});
 
-    session->close(OK, response_body, response_headers);
+    session->close( OK, response_body, response_headers);
 }
 
 
@@ -1760,7 +1760,7 @@ ArqmaRequests::get_version(
     auto response_headers = make_headers({{ "Content-Length",
                                             to_string(response_body.size())}});
 
-    session->close(OK, response_body, response_headers);
+    session->close( OK, response_body, response_headers);
 }
 
 
@@ -1796,7 +1796,7 @@ ArqmaRequests::generic_options_handler(
                    [](const shared_ptr< Session > session,
                    const Bytes &)
     {
-        session->close(OK, string{}, make_headers());
+        session->close( OK, string{}, make_headers());
     });
 }
 
@@ -1826,7 +1826,7 @@ ArqmaRequests::print_json_log(const string& text, const json& j)
 string
 ArqmaRequests::body_to_string(const Bytes & body)
 {
-    return string(reinterpret_cast<const char *>(body.data()), body.size());
+    return string(reinterpret_cast<const char*>(body.data()), body.size());
 }
 
 json
@@ -1994,7 +1994,7 @@ ArqmaRequests::select_account(
 
     if (!xmr_accounts->select(xmr_address, *acc))
     {
-        OMERROR << xmr_address.substr(0,6) +
+        OMERROR << xmr_address.substr(0, 6) +
                    ": address does not exists!";
 
         return acc;
@@ -2012,7 +2012,7 @@ ArqmaRequests::select_payment(
      if (!xmr_accounts->select(xmr_account.id.data,
                                xmr_payments))
      {
-         OMINFO << xmr_account.address.substr(0,6) +
+         OMINFO << xmr_account.address.substr(0, 6) +
                     ": no payment record found!";
 
          // so create empty record to be inserted into
@@ -2025,7 +2025,7 @@ ArqmaRequests::select_payment(
 
      if (xmr_payments.size() > 1)
      {
-         OMERROR << xmr_account.address.substr(0,6) +
+         OMERROR << xmr_account.address.substr(0, 6) +
                     ": more than one payment record found!";
          return {};
      }
@@ -2036,7 +2036,7 @@ ArqmaRequests::select_payment(
      // paymnet will be created
      if (xmr_payments.empty())
      {
-         OMINFO << xmr_account.address.substr(0,6) +
+         OMINFO << xmr_account.address.substr(0, 6) +
                     ": no payment record found!";
 
          // so create empty record to be inserted into

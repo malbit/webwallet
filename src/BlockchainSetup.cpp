@@ -155,7 +155,7 @@ BlockchainSetup::read_config(string config_json_path)
 
 
 
-    void
+void
 BlockchainSetup::_init()
 {
     refresh_block_status_every

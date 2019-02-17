@@ -42,7 +42,7 @@ CurrentBlockchainStatus::monitor_blockchain()
 		stop_search_threads();
 		clean_search_thread_map();
 		OMINFO << "Breaking monitor_blockchain thread loop.";
-                break;
+        break;
 	   }
 
            update_current_blockchain_height();
@@ -137,7 +137,7 @@ CurrentBlockchainStatus::get_blocks_range(
 
 bool
 CurrentBlockchainStatus::get_block_txs(
-        const block &blk,
+        const block& blk,
         vector<transaction>& blk_txs,
         vector<crypto::hash>& missed_txs)
 {
@@ -508,8 +508,7 @@ CurrentBlockchainStatus::search_if_payment_made(
 
     PaymentSearcher<crypto::hash8> tx_searcher {
       bc_setup.import_payment_address,
-      bc_setup.import_payment_viewkey,
-      mcore.get()};
+      bc_setup.import_payment_viewkey};
 
 
     auto found_amount_pair = std::make_pair(0ull, std::cend(txs_to_check));
@@ -727,7 +726,7 @@ CurrentBlockchainStatus::find_tx_in_mempool(
 
     for (auto const& mtx: mempool_txs)
     {
-        const transaction &m_tx = mtx.second;
+        const transaction& m_tx = mtx.second;
 
         if (get_transaction_hash(m_tx) == tx_hash)
         {
@@ -813,7 +812,7 @@ CurrentBlockchainStatus::get_tx(
 bool
 CurrentBlockchainStatus::get_tx_block_height(
         crypto::hash const& tx_hash,
-        int64_t& tx_height)
+        uint64_t tx_height)
 {
     if (!tx_exist(tx_hash))
         return false;
@@ -832,7 +831,7 @@ CurrentBlockchainStatus::set_new_searched_blk_no(
     if (searching_threads.count(address) == 0)
     {
         // thread does not exist
-        OMERROR << address.substr(0,6)
+        OMERROR << address.substr(0, 6)
                    + ": set_new_searched_blk_no failed:"
                    " thread does not exist";
         return false;

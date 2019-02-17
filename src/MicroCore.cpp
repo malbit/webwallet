@@ -117,7 +117,7 @@ MicroCore::get_block_complete_entry(block const& b, block_complete_entry& bce)
 {
     bce.block = cryptonote::block_to_blob(b);
 
-    for (const auto &tx_hash: b.tx_hashes)
+    for (const auto& tx_hash: b.tx_hashes)
     {
       transaction tx;
 

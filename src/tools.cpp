@@ -710,6 +710,32 @@ get_payment_id(const vector<uint8_t>& extra,
     return false;
 }
 
+// just a copy from bool
+// device_default::encrypt_payment_id(crypto::hash8 &payment_id, const crypto::public_key &public_key, const crypto::secret_key &secret_key)
+bool
+encrypt_payment_id(crypto::hash8 &payment_id,
+	                const crypto::public_key &public_key,
+	                const crypto::secret_key &secret_key)
+	{
+	    #define ENCRYPTED_PAYMENT_ID_TAIL 0x8d
+	
+	    crypto::key_derivation derivation;
+	    crypto::hash hash;
+	    char data[33]; /* A hash, and an extra byte */
+	
+	    if (!generate_key_derivation(public_key, secret_key, derivation))
+	        return false;
+	
+	    memcpy(data, &derivation, 32);
+	    data[32] = ENCRYPTED_PAYMENT_ID_TAIL;
+	    cn_fast_hash(data, 33, hash);
+	
+	    for (size_t b = 0; b < 8; ++b)
+	        payment_id.data[b] ^= hash.data[b];
+	
+	    return true;
+	}
+
 array<size_t, 5>
 timestamp_difference(uint64_t t1, uint64_t t2)
 {
@@ -798,8 +824,8 @@ decode_ringct(const rct::rctSig& rv,
               const crypto::public_key &pub,
               const crypto::secret_key &sec,
               unsigned int i,
-              rct::key & mask,
-              uint64_t & amount)
+              rct::key& mask,
+              uint64_t& amount)
 {
     crypto::key_derivation derivation;
 
@@ -811,12 +837,22 @@ decode_ringct(const rct::rctSig& rv,
         return false;
     }
 
-    crypto::secret_key scalar1;
+    return decode_ringct(rv, derivation, i, mask, amount);
+}
 
-    crypto::derivation_to_scalar(derivation, i, scalar1);
-
+bool
+decode_ringct(rct::rctSig const& rv,
+              crypto::key_derivation const& derivation,
+              unsigned int i,
+              rct::key& mask,
+              uint64_t& amount)
+{
     try
     {
+        crypto::secret_key scalar1;
+        
+        crypto::derivation_to_scalar(derivation, i, scalar1);
+        
         switch (rv.type)
         {
             case rct::RCTTypeSimple:
@@ -828,7 +864,7 @@ decode_ringct(const rct::rctSig& rv,
                                               hw::get_device("default"));
                 break;
             case rct::RCTTypeFull:
-	          case rct::RCTTypeFullBulletproof:
+	        case rct::RCTTypeFullBulletproof:
                 amount = rct::decodeRct(rv,
                                         rct::sk2rct(scalar1),
                                         i,
@@ -836,18 +872,19 @@ decode_ringct(const rct::rctSig& rv,
                                         hw::get_device("default"));
                 break;
             default:
-                cerr << "Unsupported rct type: " << rv.type << endl;
+                cerr << "Unsupported rct type: " << rv.type << '\n';
                 return false;
         }
     }
-    catch (const std::exception &e)
+    catch (...)
     {
-        cerr << "Failed to decode input " << i << endl;
+        cerr << "Failed to decode input " << i << '\n';
         return false;
     }
 
     return true;
 }
+
 
 bool
 url_decode(const std::string& in, std::string& out)
@@ -1107,7 +1144,7 @@ make_tx_from_json(const string& json_str, transaction& tx)
 
             vector<signature> sig_split;
 
-            auto split_sig = [&](string::iterator &b, string::iterator &e)
+            auto split_sig = [&](string::iterator& b, string::iterator& e)
             {
                 signature a_sig;
 

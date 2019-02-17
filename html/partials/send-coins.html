@@ -12,7 +12,7 @@
                     <div ng-show="!success_page">
                         <div class="header-div-block">
                             <h1 class="heading-contained">Send Funds</h1>
-                            <div class="subhead-text inner">Send funds to any ArQmA user anywhere in the world</div>
+                            <div class="subhead-text inner">Send funds to any Arqma user anywhere in the world</div>
                         </div>
                     </div>
                     <div ng-show="success_page">
@@ -36,7 +36,7 @@
                 <form name="email-form" data-name="Email Form" data-redirect="/transaction-successful.html"
                       ng-submit="sendCoins(targets, mixins, payment_id)">
                     <label class="send-label" for="receiver-address">Receiver Address</label>
-                    <input class="w-input" id="receiver-address" type="text" placeholder="ArQmA Reciepient Wallet Address"
+                    <input class="w-input" id="receiver-address" type="text" placeholder="Arqma Reciepient Wallet Address"
                            name="Receiver-address" data-name="Receiver address" required="required" ng-model="targets[0].address">
                     <div class="w-row">
                         <div class="w-col w-col-6 responsive-column">
@@ -71,10 +71,10 @@
                            data-wait="Please wait..." ng-disabled="submitting">
                 </form>
                 <div class="w-form-done" style="display: block;" ng-show="!!status">
-                    <p>{{status}}</p>
+                    <p>{{ status }}</p>
                 </div>
                 <div class="w-form-fail error-backing" style="display: block;" ng-show="!!error">
-                    <p>{{error}}</p>
+                    <p>{{ error }}</p>
                 </div>
             </div>
         </div>
@@ -83,25 +83,25 @@
                 <form name="email-form" data-name="Email Form" data-redirect="/send.html" ng-submit="resetSuccessPage()">
                     <label class="send-label" for="Receiver-address">Receiver Address</label>
                     <div class="move-text-div">
-                        <div class="middle-text receive">{{sent_tx.address}} <span ng-show="sent_tx.domain">({{sent_tx.domain}})</span></div>
+                        <div class="middle-text receive">{{ sent_tx.address }} <span ng-show="sent_tx.domain">({{ sent_tx.domain }})</span></div>
                     </div>
                     <div class="w-row">
                         <div class="w-col w-col-4 responsive-column">
                             <label class="send-label" for="Amount">Amount</label>
-                            <div class="middle-text receive">{{sent_tx.amount | money}} (+{{sent_tx.tx_fee | money}} fee)</div>
+                            <div class="middle-text receive">{{ sent_tx.amount | money }} (+{{ sent_tx.tx_fee | money }} fee)</div>
                         </div>
                         <div class="w-col w-col-8 responsive-column">
                             <label class="send-label" >Payment ID</label>
-                            <div class="middle-text receive">{{sent_tx.payment_id || "N/A"}}</div>
+                            <div class="middle-text receive">{{ sent_tx.payment_id || "N/A" }}</div>
                         </div>
                     </div>
                     <label class="send-label" >Transaction ID/Hash</label>
                     <div class="move-text-div">
-                        <div class="middle-text receive">{{sent_tx.tx_id}}</div>
+                        <div class="middle-text receive">{{ sent_tx.tx_id }}</div>
                     </div>
                     <label class="send-label" >Transaction Private Key</label>
                     <div class="move-text-div">
-                        <div class="middle-text receive">{{sent_tx.tx_prvkey}}</div>
+                        <div class="middle-text receive">{{ sent_tx.tx_prvkey }}</div>
                     </div>
                     <label class="send-label" >Soon should be visible in a blockchain explorer</label>
                     <div class="move-text-div">
