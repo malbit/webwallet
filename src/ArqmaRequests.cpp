@@ -7,7 +7,9 @@
 
 #include "ArqmaRequests.h"
 
-#include "ssqlses.h"
+#include "db/ssqlses.h"
+#include "version.h"
+#include "../gen/arqversion.h"
 
 namespace xmreg
 {
@@ -1745,8 +1747,8 @@ ArqmaRequests::get_version(
         {"last_git_commit_hash", string {GIT_COMMIT_HASH}},
         {"last_git_commit_date", string {GIT_COMMIT_DATETIME}},
         {"git_branch_name"     , string {GIT_BRANCH_NAME}},
-        {"arqma_version_full"  , string {ARQMA_VERSION_FULL}},
-        {"api"                 , OPENMONERO_RPC_VERSION},
+        {"arqma_version_full"  , string {"ARQMA_VERSION_FULL"}},
+        {"api"                 , ARQWALLET_RPC_VERSION},
         {"testnet"             , current_bc_status->get_bc_setup().net_type
                     == network_type::TESTNET},
         {"network_type"        , current_bc_status->get_bc_setup().net_type},

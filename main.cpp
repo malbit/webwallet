@@ -93,7 +93,7 @@ defaultConf.setGlobally(el::ConfigurationType::Format,
 			"%datetime [%levshort,%logger,%fbase:%func:%line]"
 		        " %msg");
 
-el::Loggers::reconfigureLogger(OPENMONERO_LOG_CATEGORY, defaultConf);
+el::Loggers::reconfigureLogger(ARQWALLET_LOG_CATEGORY, defaultConf);
 
 OMINFO << "ArqmaWallet is starting";
 

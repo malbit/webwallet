@@ -2,8 +2,8 @@
 // Created by mwo on 12/07/18.
 //
 
-#ifndef OPENMONERO_MYSQLPING_H
-#define OPENMONERO_MYSQLPING_H
+#ifndef ARQWALLET_MYSQLPING_H
+#define ARQWALLET_MYSQLPING_H
 
 #include "MySqlConnector.h"
 
@@ -48,4 +48,4 @@ private:
 };
 }
 
-#endif //OPENMONERO_MYSQLPING_H
+#endif //ARQWALLET_MYSQLPING_H

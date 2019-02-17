@@ -2,11 +2,11 @@
 // Created by mwo on 10/07/18.
 //
 
-#ifndef OPENMONERO_BLOCKCHAINSETUP_H
-#define OPENMONERO_BLOCKCHAINSETUP_H
+#ifndef ARQWALLET_BLOCKCHAINSETUP_H
+#define ARQWALLET_BLOCKCHAINSETUP_H
 
-#include "arqma_headers.h"
-#include "tools.h"
+#include "src/arqma_headers.h"
+#include "utils.h"
 
 #include <string>
 
@@ -88,4 +88,4 @@ private:
 }
 
 
-#endif //OPENMONERO_BLOCKCHAINSETUP_H
+#endif //ARQWALLET_BLOCKCHAINSETUP_H

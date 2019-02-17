@@ -3,20 +3,18 @@ cmake_minimum_required(VERSION 3.2)
 project(myxrm)
 
 set(SOURCE_FILES
-    MicroCore.cpp
-    tools.cpp
     CmdLineOptions.cpp
     CurrentBlockchainStatus.cpp
-    MySqlConnector.cpp
-    MySqlAccounts.cpp
-    ssqlses.cpp
+    db/MySqlConnector.cpp
+    db/MySqlAccounts.cpp
+    db/ssqlses.cpp
     ArqmaRequests.cpp
     TxSearch.cpp
     RPCCalls.cpp
-    version.h.in
+    arqversion.h.in
     BlockchainSetup.cpp
     ThreadRAII.cpp
-    MysqlPing.cpp
+    db/MysqlPing.cpp
     TxUnlockChecker.cpp
     UniversalIdentifier.cpp
     RandomOutputs.cpp)
@@ -27,3 +25,10 @@ set(SOURCE_FILES
 add_library(myxrm
 		STATIC
 		${SOURCE_FILES})
+
+target_include_monero_directories(myxrm)
+target_include_directories(myxrm PRIVATE "arqmacore")
+
+    #target_include_directories(myxmr
+    #  PUBLIC
+    #${ARQMA_SOURCE_DIR}/contrib/epee/include)

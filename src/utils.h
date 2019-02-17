@@ -13,9 +13,9 @@
 #define REMOVE_HASH_BRAKETS(a_hash) \
     a_hash.substr(1, a_hash.size()-2)
 
-#include "arqma_headers.h"
+#include "src/arqma_headers.h"
 
-#include "../ext/json.hpp"
+#include "ext/json.hpp"
 
 #include <boost/lexical_cast.hpp>
 #include <boost/filesystem.hpp>
@@ -217,7 +217,7 @@ decode_ringct(rct::rctSig const& rv,
 	          unsigned int i,
 	          rct::key& mask,
 	          uint64_t& amount);
-	          
+
 bool
 url_decode(const std::string& in, std::string& out);
 
