@@ -52,7 +52,7 @@ TxSearch::TxSearch(XmrAccount& _acc,
 
     last_ping_timestamp = 0s;
 
-    address_prefix = acc->address.substr(0,6);
+    address_prefix = acc->address.substr(0, 6);
 
     ping();
 }

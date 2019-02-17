@@ -3,6 +3,7 @@
 //
 
 #include "CurrentBlockchainStatus.h"
+#include "src/UniversalIdentifier.hpp"
 
 
 #undef ARQMA_DEFAULT_LOG_CATEGORY
@@ -669,43 +670,45 @@ CurrentBlockchainStatus::search_if_payment_made(
       return false;
     }
 
-//    PaymentSearcher<crypto::hash8> tx_searcher {
-//      bc_setup.import_payment_address,
-//      bc_setup.import_payment_viewkey};
+    for (auto&& tx: txs_to_check)
+    {
+        auto identifier = make_identifier(
+                            tx,
+                            make_unique<Output>(
+                                &bc_setup.import_payment_address,
+                                &bc_setup.import_payment_viewkey),
+                            make_unique<IntegratedPaymentID>(
+                                &bc_setup.import_payment_address,
+                                &bc_setup.import_payment_viewkey));
+        identifier.identify();
 
+        auto payment_id = identifier.get<IntegratedPaymentID>()->get();
 
-//    auto found_amount_pair = std::make_pair(0ull, std::cend(txs_to_check));
+        if (payment_id == expected_payment_id)
+        {
+            auto amount_paid = identifier.get<Output>()->get_total();
 
-//    try
-//    {
-//      found_amount_pair
-//              = tx_searcher.search(expected_payment_id, txs_to_check);
-//    }
-//    catch (PaymentSearcherException const& e)
-//    {
-//      OMERROR << e.what();
-//      return false;
-//    }
+            if (amount_paid >= desired_amount)
+            {
 
-//    if (found_amount_pair.first >= desired_amount)
-//    {
-//      string tx_hash_str = pod_to_hex(
-//                   get_transaction_hash(*found_amount_pair.second));
+                string tx_hash_str = pod_to_hex(
+                  get_transaction_hash(tx));
 
-//        OMINFO << " Payment id check in tx: "
-//               << tx_hash_str
-//               << " found: " << found_amount_pair.first;
+                OMINFO << " Payment id check in tx: " << tx_hash_str
+                       << " found: " << amount_paid;
 
-        // the payment has been made.
-//        tx_hash_with_payment = tx_hash_str;
-//        OMINFO << "Import payment done";
+                // the payment has been made.
+                tx_hash_with_payment = tx_hash_str;
 
-//        return true;
-//    }
+                OMINFO << "Import payment done";
 
-//    return false;
-//}
+                return true;
+            }
+        }
+    }
 
+    return false;
+}
 
 string
 CurrentBlockchainStatus::get_payment_id_as_string(const transaction& tx)

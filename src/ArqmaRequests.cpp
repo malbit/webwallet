@@ -6,6 +6,7 @@
 
 
 #include "ArqmaRequests.h"
+#include "src/UniversalIdentifier.hpp"
 
 #include "db/ssqlses.h"
 #include "version.h"
