@@ -217,7 +217,7 @@ CurrentBlockchainStatus::get_txs(
 }
 
 bool
-CurrentBlockchainStatus::tx_exist(const crypto::hash& tx_hash)
+CurrentBlockchainStatus::tx_exists(const crypto::hash& tx_hash)
 {
 
     auto future_result = thread_pool->submit(
@@ -230,7 +230,7 @@ CurrentBlockchainStatus::tx_exist(const crypto::hash& tx_hash)
 }
 
 bool
-CurrentBlockchainStatus::tx_exist(
+CurrentBlockchainStatus::tx_exists(
         const crypto::hash& tx_hash,
         uint64_t& tx_index)
 {
@@ -238,7 +238,7 @@ CurrentBlockchainStatus::tx_exist(
             [this](auto const& tx_hash,
                    auto& tx_index) -> bool
             {
-                return this->tx_exist(tx_hash, tx_index);
+                return this->tx_exists(tx_hash, tx_index);
             }, std::cref(tx_hash), std::ref(tx_index));
 
     return future_result.get();
@@ -246,7 +246,7 @@ CurrentBlockchainStatus::tx_exist(
 
 
 bool
-CurrentBlockchainStatus::tx_exist(
+CurrentBlockchainStatus::tx_exists(
         const string& tx_hash_str,
         uint64_t& tx_index)
 {
@@ -254,7 +254,7 @@ CurrentBlockchainStatus::tx_exist(
 
     if (hex_to_pod(tx_hash_str, tx_hash))
     {
-        return tx_exist(tx_hash, tx_index);
+        return tx_exists(tx_hash, tx_index);
     }
 
     return false;
@@ -265,7 +265,7 @@ CurrentBlockchainStatus::get_output_tx_and_index(
 {
     auto future_result = thread_pool->submit(
         [this](auto amount, auto index)
-            -> tx_out_idxex
+            -> tx_out_index
         {
             return this->mcore
             ->get_output_tx_and_index(amount, index);
@@ -975,7 +975,7 @@ CurrentBlockchainStatus::get_tx_block_height(
         crypto::hash const& tx_hash,
         uint64_t tx_height)
 {
-    if (!tx_exist(tx_hash))
+    if (!tx_exists(tx_hash))
         return false;
 
     auto future_result = thread_pool->submit(

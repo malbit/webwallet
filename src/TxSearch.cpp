@@ -269,7 +269,7 @@ TxSearch::operator()()
                     }
 
 
-                    if (!current_bc_status->tx_exist(tx_hash, blockchain_tx_id))
+                    if (!current_bc_status->tx_exists(tx_hash, blockchain_tx_id))
                     {
                         OMERROR << "Tx " << oi_identification.get_tx_hash_str()
                                 << " " << pod_to_hex(tx_hash)
@@ -435,7 +435,7 @@ TxSearch::operator()()
                     if (blockchain_tx_id == 0)
                     {
                         if (!current_bc_status
-                                ->tx_exist(oi_identification.tx_hash,
+                                ->tx_exists(oi_identification.tx_hash,
                                            blockchain_tx_id))
                         {
                             OMERROR << address_prefix + ": Tx "

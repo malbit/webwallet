@@ -104,13 +104,13 @@ public:
             vector<crypto::hash>& missed_txs);
 
     bool
-    tx_exist(const crypto::hash& tx_hash);
+    tx_exists(const crypto::hash& tx_hash);
 
     bool
-    tx_exist(const crypto::hash& tx_hash, uint64_t& tx_index);
+    tx_exists(const crypto::hash& tx_hash, uint64_t& tx_index);
 
     bool
-    tx_exist(const string& tx_hash_str, uint64_t& tx_index);
+    tx_exists(const string& tx_hash_str, uint64_t& tx_index);
 
     bool
     get_tx_with_output(uint64_t output_idx, uint64_t amount,
@@ -156,7 +156,7 @@ public:
     virtual bool
     get_outs(COMMAND_RPC_GET_OUTPUTS_BIN::request const& req,
              COMMAND_RPC_GET_OUTPUTS_BIN::response& res) const;
-             
+
     uint64_t
     get_dynamic_per_kb_fee_estimate() const;
 

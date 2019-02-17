@@ -508,7 +508,7 @@ MySqlAccounts::select_txs_for_account_spendability_check(
 
                 uint64_t blockchain_tx_id {0};
 
-                current_bc_status->tx_exist(tx.hash, blockchain_tx_id);
+                current_bc_status->tx_exists(tx.hash, blockchain_tx_id);
 
                 if (blockchain_tx_id != tx.blockchain_tx_id)
                 {
