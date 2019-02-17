@@ -223,7 +223,7 @@ CurrentBlockchainStatus::tx_exists(const crypto::hash& tx_hash)
     auto future_result = thread_pool->submit(
             [this](auto const& tx_hash) -> bool
             {
-                return this->have_tx(tx_hash);
+                return this->mcore->have_tx(tx_hash);
             }, std::cref(tx_hash));
 
     return future_result.get();
@@ -238,7 +238,7 @@ CurrentBlockchainStatus::tx_exists(
             [this](auto const& tx_hash,
                    auto& tx_index) -> bool
             {
-                return this->tx_exists(tx_hash, tx_index);
+                return this->mcore->tx_exists(tx_hash, tx_index);
             }, std::cref(tx_hash), std::ref(tx_index));
 
     return future_result.get();
@@ -272,6 +272,25 @@ CurrentBlockchainStatus::get_output_tx_and_index(
         }, amount, index);
 
     return future_result.get();
+}
+
+void
+CurrentBlockchainStatus::get_output_tx_and_index(
+            uint64_t amount,
+            std::vector<uint64_t> const& offsets,
+            std::vector<tx_out_index>& indices) const
+{
+    auto future_result = thread_pool->submit(
+        [this](auto amount,
+               auto const& offsets,
+               auto& indices)
+            -> void
+        {
+            this->mcore
+                ->get_output_tx_and_index(
+                        amount, offsets, indices);
+        }, amount, std::cref(offsets),
+           std::ref(indices));
 }
 
 bool
@@ -330,7 +349,7 @@ CurrentBlockchainStatus::get_output_keys(
                             absolute_offsets, outputs);
                     return true;
                 }
-                catch (const OUTPUT_DNE& e)
+                catch (std::exception const& e)
                 {
                     OMERROR << "get_output_keys: " << e.what();
                 }
@@ -724,7 +743,7 @@ CurrentBlockchainStatus::get_output_key(
         {
             return this->mcore->get_output_key(
                     amount, global_amount_index);
-        ), amount, global_amount_index);
+        }, amount, global_amount_index);
 
     return future_result.get();
 }
@@ -788,7 +807,7 @@ CurrentBlockchainStatus::get_searched_blk_no(const string& address,
     if (!search_thread_exist(address))
     {
         // thread does not exist
-        OMERROR << "thread for " << address << " does not exist";
+        OMERROR << "thread for " << address.substr(0,6) << " does not exist";
         return false;
     }
 
@@ -807,7 +826,7 @@ CurrentBlockchainStatus::get_known_outputs_keys(
     if (!search_thread_exist(address))
     {
         // thread does not exist
-        OMERROR << "thread for " << address << " does not exist";
+        OMERROR << "thread for " << address.substr(0,6) << " does not exist";
         return false;
     }
 
@@ -838,7 +857,7 @@ CurrentBlockchainStatus::get_xmr_address_viewkey(
     if (!search_thread_exist(address_str))
     {
         // thread does not exist
-        OMERROR << "thread for " << address_str << " does not exist";
+        OMERROR << "thread for " << address_str.substr(0,6) << " does not exist";
         return false;
     }
 
@@ -860,7 +879,7 @@ CurrentBlockchainStatus::find_txs_in_mempool(
     if (searching_threads.count(address_str) == 0)
     {
         // thread does not exist
-        OMERROR << "thread for " << address_str << " does not exist";
+        OMERROR << "thread for " << address_str.substr(0,6) << " does not exist";
         return false;
     }
 
@@ -999,7 +1018,7 @@ CurrentBlockchainStatus::set_new_searched_blk_no(
     if (searching_threads.count(address) == 0)
     {
         // thread does not exist
-        OMERROR << address.substr(0, 6)
+        OMERROR << address.substr(0,6)
                    + ": set_new_searched_blk_no failed:"
                    " thread does not exist";
         return false;
@@ -1191,6 +1210,36 @@ CurrentBlockchainStatus::get_txs_in_blocks(
     (void) missed_txs;
 
     return true;
+}
+
+MicroCoreAdapter::MicroCoreAdapter(CurrentBlockchainStatus* _cbs)
+: cbs {_cbs}
+{}
+
+void
+MicroCoreAdapter::get_output_key(uint64_t amount,
+                  vector<uint64_t> const& absolute_offsets,
+                  vector<cryptonote::output_data_t>& outputs)
+                   const
+{
+    cbs->get_output_keys(amount, absolute_offsets, outputs);
+}
+
+void
+MicroCoreAdapter::get_output_tx_and_index(
+            uint64_t amount,
+            std::vector<uint64_t> const& offsets,
+            std::vector<tx_out_index>& indices)
+                const
+{
+    cbs->get_output_tx_and_index(amount, offsets, indices);
+}
+
+bool
+MicroCoreAdapter::get_tx(crypto::hash const& tx_hash, transaction& tx)
+        const
+{
+    return cbs->get_tx(tx_hash, tx);
 }
 
 }

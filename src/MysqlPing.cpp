@@ -17,7 +17,7 @@ MysqlPing::MysqlPing(
         std::shared_ptr<MySqlConnector> _conn,
         seconds _ping_time, seconds _sleep_time)
         : conn {_conn}, ping_time {_ping_time},
-	  thread_sleep_time {_sleep_time}
+	        thread_sleep_time {_sleep_time}
 {}
 
 void

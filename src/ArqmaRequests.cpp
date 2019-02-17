@@ -8,7 +8,6 @@
 #include "ArqmaRequests.h"
 
 #include "ssqlses.h"
-#include "OutputInputIdentification.h"
 
 namespace xmreg
 {
@@ -1096,7 +1095,7 @@ ArqmaRequests::import_wallet_request(
 
         if ((payment_table_id = xmr_accounts->insert(*xmr_payment)) == 0)
         {
-            OMERROR << xmr_address.substr(0, 6)
+            OMERROR << xmr_address.substr(0,6)
                        + ": failed to create new payment record!";
 
             session_close(session, j_response, UNPROCESSABLE_ENTITY,
@@ -1185,7 +1184,7 @@ ArqmaRequests::import_wallet_request(
         if (!xmr_accounts->update(*xmr_payment, updated_xmr_payment))
         {
 
-            OMERROR << xmr_address.substr(0, 6) +
+            OMERROR << xmr_address.substr(0,6) +
                         "Updating payment db failed!\n";
 
             session_close(session, j_response, UNPROCESSABLE_ENTITY,
@@ -1202,7 +1201,7 @@ ArqmaRequests::import_wallet_request(
 
         if (!xmr_accounts->update(*xmr_account, updated_acc))
         {
-            OMERROR << xmr_address.substr(0, 6) +
+            OMERROR << xmr_address.substr(0,6) +
                         "Updating scanned_block_height failed!\n";
 
             session_close(session, j_response, UNPROCESSABLE_ENTITY,
@@ -1540,6 +1539,8 @@ ArqmaRequests::get_tx(
         address_parse_info address_info;
         secret_key viewkey;
 
+        MicroCoreAdapter mcore_addapter {current_bc_status.get()};
+
         // to get info about recived xmr in this tx, we calculate it from
         // scrach, i.e., search for outputs. We could get this info
         // directly from the database, but doing it again here, is a good way
@@ -1552,21 +1553,16 @@ ArqmaRequests::get_tx(
         if (current_bc_status->get_xmr_address_viewkey(
                     xmr_address, address_info, viewkey))
         {
-            OutputInputIdentification oi_identification {
-                &address_info, &viewkey, &tx, tx_hash,
-                        coinbase};
 
-            oi_identification.identify_outputs();
+            auto identifier = make_identifier(tx,
+                            make_unique<Output>(&address_info, &viewkey));
 
-            uint64_t total_received {0};
+            identifier.identify();
 
-            // we just get total amount recieved. we have viewkey,
-            // so this must be correct and front end does not
-            // need to do anything to check this.
-            for (auto& out_info: oi_identification.identified_outputs)
-            {
-                total_received += out_info.amount;
-            }
+            auto const& outputs_identified
+                    = identifier.get<Output>()->get();
+
+            auto total_received = calc_total_xmr(outputs_identified);
 
             j_response["total_received"] = std::to_string(total_received);
 
@@ -1664,20 +1660,22 @@ ArqmaRequests::get_tx(
                         // Class that is resposnible for idenficitaction
                         // of our outputs
                         // and inputs in a given tx.
-                        OutputInputIdentification oi_identification
-                                {&address_info, &viewkey, &tx, tx_hash,
-                                    coinbase};
 
-                        // no need mutex here, as this will be exectued only
-                        // after the above. there is no threads here.
-                        oi_identification.identify_inputs(known_outputs_keys,
-                                                          current_bc_status.get());
+                        auto identifier = make_identifier(tx,
+                                        make_unique<Input>(&address_info, &viewkey,
+                                                           &known_outputs_keys,
+                                                           &mcore_addapter));
+                        identifier.identify();
+
+
+                        auto const& inputs_identfied
+                           = identifier.get<Input>()->get();
 
                         json j_spent_outputs = json::array();
 
                         uint64_t total_spent {0};
 
-                        for (auto& in_info: oi_identification.identified_inputs)
+                        for (auto& in_info: inputs_identfied)
                         {
 
                             // need to get output info from mysql, as we need
@@ -1694,7 +1692,7 @@ ArqmaRequests::get_tx(
 
                                 j_spent_outputs.push_back({
                                           {"amount"     , std::to_string(in_info.amount)},
-                                          {"key_image"  , in_info.key_img},
+                                          {"key_image"  , pod_to_hex(in_info.key_img)},
                                           {"tx_pub_key" , out.tx_pub_key},
                                           {"out_index"  , out.out_index},
                                           {"mixin"      , out.mixin}});
@@ -1991,7 +1989,7 @@ ArqmaRequests::select_account(
 
     if (!xmr_accounts->select(xmr_address, *acc))
     {
-        OMERROR << xmr_address.substr(0, 6) +
+        OMERROR << xmr_address.substr(0,6) +
                    ": address does not exists!";
 
         return acc;
@@ -2009,7 +2007,7 @@ ArqmaRequests::select_payment(
      if (!xmr_accounts->select(xmr_account.id.data,
                                xmr_payments))
      {
-         OMINFO << xmr_account.address.substr(0, 6) +
+         OMINFO << xmr_account.address.substr(0,6) +
                     ": no payment record found!";
 
          // so create empty record to be inserted into
@@ -2022,7 +2020,7 @@ ArqmaRequests::select_payment(
 
      if (xmr_payments.size() > 1)
      {
-         OMERROR << xmr_account.address.substr(0, 6) +
+         OMERROR << xmr_account.address.substr(0,6) +
                     ": more than one payment record found!";
          return {};
      }
@@ -2033,7 +2031,7 @@ ArqmaRequests::select_payment(
      // paymnet will be created
      if (xmr_payments.empty())
      {
-         OMINFO << xmr_account.address.substr(0, 6) +
+         OMINFO << xmr_account.address.substr(0,6) +
                     ": no payment record found!";
 
          // so create empty record to be inserted into

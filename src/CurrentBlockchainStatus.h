@@ -116,9 +116,15 @@ public:
     get_tx_with_output(uint64_t output_idx, uint64_t amount,
                        transaction& tx, uint64_t& output_idx_in_tx);
 
-    virtual tx_out_index
+    tx_out_index
     get_output_tx_and_index(uint64_t amount,
                             uint64_t index) const;
+
+    void
+    get_output_tx_and_index(
+            uint64_t amount,
+            std::vector<uint64_t> const& offsets,
+            std::vector<tx_out_index>& indices) const;
 
     bool
     get_output_keys(const uint64_t& amount,
@@ -348,6 +354,39 @@ protected:
             vector<uint64_t> const& amounts,
             uint64_t outs_count) const;
 
+};
+
+// small adapter class that will anable using
+// BlockchainCurrentStatus inside UniversalAdapter
+// for locating inputs. We do this becasuse
+// BlockchainCurrentStatus is using a thread pool
+// to access MicroCore and blockchain. So we don't want
+// to miss on that. Also UnversalAdapter for Inputs
+// takes AbstractCore interface
+class MicroCoreAdapter : public AbstractCore
+{
+public:
+    MicroCoreAdapter(CurrentBlockchainStatus* _cbs);
+
+    virtual void
+    get_output_key(uint64_t amount,
+                   vector<uint64_t> const& absolute_offsets,
+                   vector<cryptonote::output_data_t>& outputs)
+                    const override;
+
+    virtual void
+    get_output_tx_and_index(
+            uint64_t amount,
+            std::vector<uint64_t> const& offsets,
+            std::vector<tx_out_index>& indices)
+                const override;
+
+    virtual bool
+    get_tx(crypto::hash const& tx_hash, transaction& tx)
+        const override;
+
+    private:
+        CurrentBlockchainStatus* cbs {};
 };
 
 

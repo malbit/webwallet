@@ -7,7 +7,7 @@ void
 Output::identify(transaction const& tx,
                  public_key const& tx_pub_key,
                  vector<public_key> const& additional_tx_pub_keys)
-{   
+{
     auto tx_is_coinbase = is_coinbase(tx);
 
     key_derivation derivation;
