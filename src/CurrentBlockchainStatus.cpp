@@ -238,7 +238,7 @@ CurrentBlockchainStatus::tx_exist(
             [this](auto const& tx_hash,
                    auto& tx_index) -> bool
             {
-                return this->tx_exists(tx_hash, tx_index);
+                return this->tx_exist(tx_hash, tx_index);
             }, std::cref(tx_hash), std::ref(tx_index));
 
     return future_result.get();
