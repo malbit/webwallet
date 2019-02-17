@@ -16,7 +16,6 @@ set(SOURCE_FILES
     ThreadRAII.cpp
     db/MysqlPing.cpp
     TxUnlockChecker.cpp
-    UniversalIdentifier.cpp
     RandomOutputs.cpp)
 
 # make static library called libmyxrm
