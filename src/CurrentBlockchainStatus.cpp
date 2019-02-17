@@ -244,7 +244,7 @@ CurrentBlockchainStatus::get_tx_with_output(
 
 bool
 CurrentBlockchainStatus::get_output_keys(
-        const uint64_t amount,
+        const uint64_t& amount,
         const vector<uint64_t>& absolute_offsets,
         vector<cryptonote::output_data_t>& outputs)
 {
@@ -812,7 +812,7 @@ CurrentBlockchainStatus::get_tx(
 bool
 CurrentBlockchainStatus::get_tx_block_height(
         crypto::hash const& tx_hash,
-        uint64_t& tx_height)
+        uint64_t tx_height)
 {
     if (!tx_exist(tx_hash))
         return false;

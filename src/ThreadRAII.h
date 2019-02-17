@@ -17,7 +17,7 @@ class ThreadRAII
 public:
     enum class DtorAction {join, detach};
 
-    ThreadRAII(std::thread& _t, DtorAction _action);
+    ThreadRAII(std::thread&& _t, DtorAction _action);
 
     ThreadRAII(ThreadRAII&&) = default;
     ThreadRAII& operator=(ThreadRAII&&) = default;

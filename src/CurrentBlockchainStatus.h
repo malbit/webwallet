@@ -62,213 +62,213 @@ public:
                             std::unique_ptr<MicroCore> _mcore,
                             std::unique_ptr<RPCCalls> _rpc);
 
-    virtual void
+    void
     monitor_blockchain();
 
-    virtual uint64_t
+    uint64_t
     get_current_blockchain_height();
 
-    virtual void
+    void
     update_current_blockchain_height();
 
-    virtual bool
+    bool
     init_arqma_blockchain();
 
     // inject TxUnlockChecker object
     // its simplifies mocking its behavior in our
     // tests, as we just inject mock version of
     // TxUnlockChecker class
-    virtual bool
+    bool
     is_tx_unlocked(uint64_t unlock_time,
                    uint64_t block_height,
                    TxUnlockChecker const& tx_unlock_checker
                         = TxUnlockChecker());
 
-    virtual bool
+    bool
     get_block(uint64_t height, block& blk);
 
-    virtual vector<block>
+    vector<block>
     get_blocks_range(uint64_t const& h1, uint64_t const& h2);
 
-    virtual bool
+    bool
     get_block_txs(const block& blk,
                   vector<transaction>& blk_txs,
                   vector<crypto::hash>& missed_txs);
 
-    virtual bool
+    bool
     get_txs(vector<crypto::hash> const& txs_to_get,
             vector<transaction>& txs,
             vector<crypto::hash>& missed_txs);
 
-    virtual bool
+    bool
     tx_exist(const crypto::hash& tx_hash);
 
-    virtual bool
+    bool
     tx_exist(const crypto::hash& tx_hash, uint64_t& tx_index);
 
-    virtual bool
+    bool
     tx_exist(const string& tx_hash_str, uint64_t& tx_index);
 
-    virtual bool
+    bool
     get_tx_with_output(uint64_t output_idx, uint64_t amount,
                        transaction& tx, uint64_t& output_idx_in_tx);
 
-    virtual bool
+    bool
     get_output_keys(const uint64_t& amount,
                     const vector<uint64_t>& absolute_offsets,
                     vector<cryptonote::output_data_t>& outputs);
 
-    virtual string
+    string
     get_account_integrated_address_as_str(
             crypto::hash8 const& payment_id8);
 
-    virtual string
+    string
     get_account_integrated_address_as_str(
             string const& payment_id8_str);
 
-    virtual bool
+    bool
     get_output(const uint64_t amount,
                const uint64_t global_output_index,
                COMMAND_RPC_GET_OUTPUTS_BIN::outkey& output_info);
 
-    virtual bool
+    bool
     get_amount_specific_indices(const crypto::hash& tx_hash,
                                 vector<uint64_t>& out_indices);
 
-    virtual bool
+    bool
     get_random_outputs(vector<uint64_t> const& amounts,
                        uint64_t outs_count,
                        RandomOutputs::outs_for_amount_v&
                        found_outputs);
 
-    virtual uint64_t
+    uint64_t
     get_dynamic_per_kb_fee_estimate() const;
 
-    virtual uint64_t
+    uint64_t
     get_tx_unlock_time(crypto::hash const& tx_hash) const;
 
-    virtual bool
+    bool
     commit_tx(const string& tx_blob, string& error_msg,
               bool do_not_relay = false);
 
-    virtual bool
+    bool
     read_mempool();
 
-    virtual vector<pair<uint64_t, transaction>>
+    vector<pair<uint64_t, transaction>>
     get_mempool_txs();
 
-    virtual bool
+    bool
     search_if_payment_made(
             const string& payment_id_str,
             const uint64_t& desired_amount,
             string& tx_hash_with_payment);
 
 
-    virtual string
+    string
     get_payment_id_as_string(const transaction& tx);
 
-    virtual output_data_t
+    output_data_t
     get_output_key(uint64_t amount,
                    uint64_t global_amount_index);
 
     // definitions of these function are at the end of this file
     // due to forward declaraions of TxSearch
-    virtual bool
+    bool
     start_tx_search_thread(XmrAccount acc,
                            std::unique_ptr<TxSearch> tx_search);
 
-    virtual bool
+    bool
     ping_search_thread(const string& address);
 
-    virtual bool
+    bool
     search_thread_exist(const string& address);
 
-    virtual bool
+    bool
     get_xmr_address_viewkey(const string& address_str,
                             address_parse_info& address,
                             secret_key& viewkey);
-    virtual bool
+    bool
     find_txs_in_mempool(const string& address_str,
                         json& transactions);
 
-    virtual bool
+    bool
     find_tx_in_mempool(crypto::hash const& tx_hash,
                        transaction& tx);
 
-    virtual bool
+    bool
     find_key_images_in_mempool(std::vector<txin_v> const& vin);
 
-    virtual bool
+    bool
     find_key_images_in_mempool(transaction const& tx);
 
-    virtual bool
+    bool
     get_tx(crypto::hash const& tx_hash, transaction& tx);
 
-    virtual bool
+    bool
     get_tx(string const& tx_hash_str, transaction& tx);
 
-    virtual bool
-    get_tx_block_height(crypto::hash const& tx_hash, int64_t& tx_height);
+    bool
+    get_tx_block_height(crypto::hash const& tx_hash, uint64_t tx_height);
 
-    virtual bool
+    bool
     set_new_searched_blk_no(const string& address,
                             uint64_t new_value);
 
-    virtual bool
+    bool
     get_searched_blk_no(const string& address,
                         uint64_t& searched_blk_no);
 
-    virtual bool
+    bool
     get_known_outputs_keys(string const& address,
                            unordered_map<public_key, uint64_t>& known_outputs_keys);
 
-    virtual void
+    void
     clean_search_thread_map();
 
-    virtual void
+    void
     stop_search_threads();
 
     /*
      * The frontend requires rct field to work
      * the filed consisitct of rct_pk, mask, and amount.
      */
-    virtual tuple<string, string, string>
+    tuple<string, string, string>
     construct_output_rct_field(
             const uint64_t global_amount_index,
             const uint64_t out_amount);
 
 
-    inline virtual BlockchainSetup const&
+    inline BlockchainSetup const&
     get_bc_setup() const
     {
         return bc_setup;
     }
 
-    inline virtual void
+    inline void
     set_bc_setup(BlockchainSetup const& bs)
     {
         bc_setup = bs;
     }
 
-    virtual void
+    void
     init_txs_data_vector(vector<block> const& blocks,
                          vector<crypto::hash>& txs_to_get,
                          vector<txs_tuple_t>& txs_data);
 
-    virtual bool
+    bool
     get_txs_in_blocks(vector<block> const& blocks,
                       vector<crypto::hash>& txs_hashes,
                       vector<transaction>& txs,
                       vector<txs_tuple_t>& txs_data);
 
-    virtual TxSearch&
+    TxSearch&
     get_search_thread(string const& acc_address);
 
-    inline virtual void
+    inline void
     stop() {stop_blockchain_monitor_loop = true;}
 
     // default destructor is fine
-    virtual ~CurrentBlockchainStatus() = default;
+    ~CurrentBlockchainStatus() = default;
 
     // we dont want any copies of the objects of this class
     CurrentBlockchainStatus(CurrentBlockchainStatus const&) = delete;
@@ -317,7 +317,7 @@ protected:
 
     // have this method will make it easier to moc
     // RandomOutputs in our tests later
-    virtual unique_ptr<RandomOutputs>
+    unique_ptr<RandomOutputs>
     create_random_outputs_object(
             vector<uint64_t> const& amounts,
             uint64_t outs_count) const;
