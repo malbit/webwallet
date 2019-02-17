@@ -2,6 +2,9 @@
 // Created by mwo on 13/04/16.
 //
 
+#include "easylogging++.h"
+#include "om_log.h"
+
 #include "RPCCalls.h"
 
 namespace xmreg

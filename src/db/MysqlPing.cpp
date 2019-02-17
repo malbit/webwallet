@@ -3,7 +3,7 @@
 //
 
 #include "easylogging++.h"
-#include "om_log.h"
+#include "../om_log.h"
 
 #include "MysqlPing.h"
 
