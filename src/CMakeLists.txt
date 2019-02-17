@@ -26,8 +26,8 @@ add_library(myxrm
 		STATIC
 		${SOURCE_FILES})
 
-target_include_monero_directories(myxrm)
-target_include_directories(myxrm PRIVATE "arqmacore")
+target_include_arqma_directories(myxrm)
+target_include_directories(myxrm PRIVATE "xmregcore")
 
     #target_include_directories(myxmr
     #  PUBLIC
