@@ -167,12 +167,12 @@ CurrentBlockchainStatus::get_block_txs(
 
     auto future_result = thread_pool->submit(
         [this](auto const& blk,
-               auto& blk_txs, auto& misses_txs)
+               auto& blk_txs, auto& missed_txs)
             -> bool
         {
             if (!this->mcore->get_transactions(
                         blk.tx_hashes, blk_txs,
-                        misses_txs))
+                        missed_txs))
             {
                 OMERROR << "Can't get transactions in block: "
                         << get_block_hash(blk);
@@ -182,7 +182,7 @@ CurrentBlockchainStatus::get_block_txs(
 
             return true;
         }, std::cref(blk), std::ref(blk_txs),
-           std::ref(misses_txs));
+           std::ref(missed_txs));
 
     return future_result.get();
 }
