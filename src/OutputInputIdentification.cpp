@@ -38,15 +38,17 @@ OutputInputIdentification::OutputInputIdentification(
                << pod_to_hex(tx_hash)
                << ", pub_tx_key: "
                << pod_to_hex(tx_pub_key);
-               
 
-        static_assert(sizeof(derivation) == sizeof(rct::key), 
+
+        static_assert(sizeof(derivation) == sizeof(rct::key),
 	               "Mismatched sizes of key_derivation and rct::key");
-	
-	    // use identity derivation instead  
-	    memcpy(&derivation, rct::identity().bytes, sizeof(derivation)); 
+
+	    // use identity derivation instead
+      // solution based on that found in wallet2.cpp in monero
+      // this will cause the tx output to be effectively skipped
+	    memcpy(&derivation, rct::identity().bytes, sizeof(derivation));
     }
-    
+
     status = INTERNAL_STATUS::OK;
 }
 

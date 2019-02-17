@@ -29,7 +29,7 @@ handel_::operator()(const shared_ptr< Session > session)
 
 
 ArqmaRequests::ArqmaRequests(
-        shared_ptr<MySqlAccounts> _acc, 
+        shared_ptr<MySqlAccounts> _acc,
         shared_ptr<CurrentBlockchainStatus> _current_bc_status):
     xmr_accounts {_acc}, current_bc_status {_current_bc_status}
 {
@@ -1284,7 +1284,7 @@ ArqmaRequests::import_recent_wallet_request(
                 = boost::lexical_cast<uint64_t>(
                     j_request["no_blocks_to_import"].get<string>());
     }
-    catch (boost::bad_lexical_cast& e)
+    catch (std::exception const& e)
     {
         string msg = "Cant parse "
                 + j_request["no_blocks_to_import"].get<string>()
@@ -1950,7 +1950,6 @@ ArqmaRequests::parse_request(
         json& j_request,
         json& j_response)
 {
-
     try
     {
         j_request = body_to_json(body);
@@ -1960,7 +1959,6 @@ ArqmaRequests::parse_request(
 
         for (const auto& v: values_map)
         {
-
             if (j_request.count(v) == 0)
             {
                 cerr << v + " value not provided" << endl;
@@ -1970,7 +1968,6 @@ ArqmaRequests::parse_request(
 
                 return false;
             }
-
         }
 
         return true;

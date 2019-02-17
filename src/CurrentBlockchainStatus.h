@@ -14,6 +14,8 @@
 #include "MySqlAccounts.h"
 #include "RandomOutputs.h"
 
+#include "../ext/ThreadPool.hpp"
+
 #include <iostream>
 #include <memory>
 #include <thread>
@@ -60,7 +62,8 @@ public:
 
     CurrentBlockchainStatus(BlockchainSetup _bc_setup,
                             std::unique_ptr<MicroCore> _mcore,
-                            std::unique_ptr<RPCCalls> _rpc);
+                            std::unique_ptr<RPCCalls> _rpc,
+                            std::unique_ptr<TP::ThreadPool> _tp);
 
     void
     monitor_blockchain();
@@ -113,6 +116,10 @@ public:
     get_tx_with_output(uint64_t output_idx, uint64_t amount,
                        transaction& tx, uint64_t& output_idx_in_tx);
 
+    virtual tx_out_index
+    get_output_tx_and_index(uint64_t amount,
+                            uint64_t index) const;
+
     bool
     get_output_keys(const uint64_t& amount,
                     const vector<uint64_t>& absolute_offsets,
@@ -141,6 +148,15 @@ public:
                        RandomOutputs::outs_for_amount_v&
                        found_outputs);
 
+    virtual bool
+    get_output_histogram(
+            COMMAND_RPC_GET_OUTPUT_HISTOGRAM::request& req,
+            COMMAND_RPC_GET_OUTPUT_HISTOGRAM::response& res) const;
+
+    virtual bool
+    get_outs(COMMAND_RPC_GET_OUTPUTS_BIN::request const& req,
+             COMMAND_RPC_GET_OUTPUTS_BIN::response& res) const;
+             
     uint64_t
     get_dynamic_per_kb_fee_estimate() const;
 
@@ -208,7 +224,8 @@ public:
     get_tx(string const& tx_hash_str, transaction& tx);
 
     bool
-    get_tx_block_height(crypto::hash const& tx_hash, uint64_t tx_height);
+    get_tx_block_height(crypto::hash const& tx_hash,
+                        uint64_t tx_height);
 
     bool
     set_new_searched_blk_no(const string& address,
@@ -220,7 +237,8 @@ public:
 
     bool
     get_known_outputs_keys(string const& address,
-                           unordered_map<public_key, uint64_t>& known_outputs_keys);
+                           unordered_map<public_key,
+                           uint64_t>& known_outputs_keys);
 
     void
     clean_search_thread_map();
@@ -295,6 +313,13 @@ protected:
     // use talk to monero deamon using RPC.
     std::unique_ptr<RPCCalls> rpc;
 
+    // any operation required to use blockchain
+    // i.e., access through mcore, will be performed
+    // by threads in this thread_pool. we have to
+    // have fixed and limited number of threads so that
+    // the lmdb does not throw MDB_READERS_FULL
+    std::unique_ptr<TP::ThreadPool> thread_pool;
+
     // vector of mempool transactions that all threads
     // can refer to
     //           <recieved_time, transaction>
@@ -314,6 +339,7 @@ protected:
 
     // to synchronize access to mempool_txs vector
     mutex getting_mempool_txs;
+
 
     // have this method will make it easier to moc
     // RandomOutputs in our tests later

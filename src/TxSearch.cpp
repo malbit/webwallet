@@ -67,7 +67,7 @@ TxSearch::operator()()
     auto current_bc_status_ptr = current_bc_status.get();
 
     searching_is_ongoing = true;
-    
+
     string address_prefix = acc->address.substr(0, 6);
 
     // we put everything in massive catch, as there are plenty ways in which
@@ -87,7 +87,9 @@ TxSearch::operator()()
             uint64_t h1 = searched_blk_no;
             uint64_t h2 = std::min(h1 + blocks_lookahead - 1, last_block_height);
 
-            vector<block> blocks = current_bc_status->get_blocks_range(h1, h2);
+            vector<block> blocks;
+
+            blocks = current_bc_status->get_blocks_range(h1, h2);
 
             if (blocks.empty())
             {
@@ -195,11 +197,11 @@ TxSearch::operator()()
                 OutputInputIdentification oi_identification {
                             &address, &viewkey, &tx, tx_hash,
                             is_coinbase};
-                
-                if (oi_identification.status 
+
+                if (oi_identification.status
 	                        != OutputInputIdentification::INTERNAL_STATUS::OK)
 	                {
-	                    OMWARN << address_prefix << " :tx " 
+	                    OMWARN << address_prefix << " :tx "
 	                           << pod_to_hex(tx_hash) << " skipped.";
 	                    continue;
 	                }
@@ -603,7 +605,13 @@ TxSearch::operator()()
 
             //current_timestamp = loop_timestamp;
 
-            searched_blk_no = h2 + 1;
+            // update this only when this variable is false
+            // otherwise a new search block value can
+            // be overwritten to h2, instead of the new value
+            if (!searched_block_got_updated)
+                searched_blk_no = h2 + 1;
+
+            searched_block_got_updated = false;
 
         } // while(continue_search)
 
@@ -639,6 +647,7 @@ void
 TxSearch::set_searched_blk_no(uint64_t new_value)
 {
     searched_blk_no = new_value;
+    searched_block_got_updated = true;
 }
 
 uint64_t
@@ -718,7 +727,7 @@ TxSearch::find_txs_in_mempool(
     // so we create local connection here, only to be used in this method.
 
     auto local_xmr_accounts = make_shared<MySqlAccounts>(current_bc_status);
-    
+
     string address_prefix = acc->address.substr(0, 6);
 
     for (auto const& mtx: mempool_txs)
@@ -735,11 +744,11 @@ TxSearch::find_txs_in_mempool(
         // and inputs in a given tx.
         OutputInputIdentification oi_identification
                  {&address, &viewkey, &tx, tx_hash, coinbase};
-                 
-        if (oi_identification.status 
+
+        if (oi_identification.status
 	                != OutputInputIdentification::INTERNAL_STATUS::OK)
 	        {
-	            OMWARN << address_prefix << ": mempool tx " 
+	            OMWARN << address_prefix << ": mempool tx "
 	                   << pod_to_hex(tx_hash) << " skipped.";
 	            continue;
 	        }

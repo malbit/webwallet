@@ -15,10 +15,12 @@ namespace xmreg
 CurrentBlockchainStatus::CurrentBlockchainStatus(
         BlockchainSetup _bc_setup,
         std::unique_ptr<MicroCore> _mcore,
-        std::unique_ptr<RPCCalls> _rpc)
+        std::unique_ptr<RPCCalls> _rpc,
+        std::unique_ptr<TP::ThreadPool> _tp)
     : bc_setup {_bc_setup},
       mcore {std::move(_mcore)},
-      rpc {std::move(_rpc)}
+      rpc {std::move(_rpc)},
+      thread_pool {std::move(_tp)}
 {
 
 }
@@ -38,12 +40,14 @@ CurrentBlockchainStatus::monitor_blockchain()
        while (true)
        {
            if (stop_blockchain_monitor_loop)
-	   {
-		stop_search_threads();
-		clean_search_thread_map();
-		OMINFO << "Breaking monitor_blockchain thread loop.";
-        break;
-	   }
+	         {
+		           stop_search_threads();
+		           clean_search_thread_map();
+		           OMINFO << "Breaking monitor_blockchain thread loop.";
+               break;
+	         }
+
+           OMINFO << "PoolQueue size: " << TP::DefaultThreadPool::queueSize();
 
            update_current_blockchain_height();
 
@@ -116,23 +120,38 @@ CurrentBlockchainStatus::is_tx_unlocked(
 bool
 CurrentBlockchainStatus::get_block(uint64_t height, block& blk)
 {
-    return mcore->get_block_from_height(height, blk);
+
+    auto future_result = thread_pool->submit(
+        [this](auto height, auto& blk)
+            -> bool
+        {
+            return this->mcore
+                       ->get_block_from_height(height, blk);
+        }, height, std::ref(blk));
+
+    return future_result.get();
 }
 
 vector<block>
 CurrentBlockchainStatus::get_blocks_range(
         uint64_t const& h1, uint64_t const& h2)
 {
-    try
-    {
-        return mcore->get_blocks_range(h1, h2);
-    }
-    catch (BLOCK_DNE& e)
-    {
-        cerr << e.what() << endl;
-    }
+    auto future_result = thread_pool->submit(
+        [this](auto h1, auto h2)
+            -> vector<block>
+        {
+            try
+            {
+                return this->mcore->get_blocks_range(h1, h2);
+            }
+            catch (BLOCK_DNE& e)
+            {
+                OMERROR << e.what();
+                return {};
+            }
+        }, h1, h2);
 
-    return {};
+    return future_result.get();
 }
 
 bool
@@ -146,16 +165,28 @@ CurrentBlockchainStatus::get_block_txs(
     // the block i.e. coinbase tx.
     blk_txs.push_back(blk.miner_tx);
 
-    if (!mcore->get_transactions(blk.tx_hashes, blk_txs, missed_txs))
-    {
-        OMERROR << "Cant get transactions in block: "
-                << get_block_hash(blk);
+    auto future_result = thread_pool->submit(
+        [this](auto const& blk,
+               auto& blk_txs, auto& misses_txs)
+            -> bool
+        {
+            if (!this->mcore->get_transactions(
+                        blk.tx_hashes, blk_txs,
+                        misses_txs))
+            {
+                OMERROR << "Can't get transactions in block: "
+                        << get_block_hash(blk);
 
-        return false;
-    }
+                return false;
+            }
 
-    return true;
+            return true;
+        }, std::cref(blk), std::ref(blk_txs),
+           std::ref(misses_txs));
+
+    return future_result.get();
 }
+
 
 bool
 CurrentBlockchainStatus::get_txs(
@@ -163,20 +194,39 @@ CurrentBlockchainStatus::get_txs(
         vector<transaction>& txs,
         vector<crypto::hash>& missed_txs)
 {
-    if (!mcore->get_transactions(txs_to_get, txs, missed_txs))
-    {
-        OMERROR << "CurrentBlockchainStatus::get_txs: "
-                   "cant get transactions!";
-        return false;
-    }
 
-    return true;
+    auto future_result = thread_pool->submit(
+            [this](auto const& txs_to_get,
+                auto& txs, auto& missed_txs)
+                -> bool
+            {
+                if (!this->mcore->get_transactions(
+                           txs_to_get, txs, missed_txs))
+                {
+                    OMERROR << "CurrentBlockchainStatus::get_txs: "
+                               "can't get transactions!";
+                    return false;
+                }
+
+                return true;
+
+            }, std::cref(txs_to_get), std::ref(txs),
+               std::ref(missed_txs));
+
+    return future_result.get();
 }
 
 bool
 CurrentBlockchainStatus::tx_exist(const crypto::hash& tx_hash)
 {
-    return mcore->have_tx(tx_hash);
+
+    auto future_result = thread_pool->submit(
+            [this](auto const& tx_hash) -> bool
+            {
+                return this->have_tx(tx_hash);
+            }, std::cref(tx_hash));
+
+    return future_result.get();
 }
 
 bool
@@ -184,7 +234,14 @@ CurrentBlockchainStatus::tx_exist(
         const crypto::hash& tx_hash,
         uint64_t& tx_index)
 {
-    return mcore->tx_exists(tx_hash, tx_index);
+    auto future_result = thread_pool->submit(
+            [this](auto const& tx_hash,
+                   auto& tx_index) -> bool
+            {
+                return this->tx_exists(tx_hash, tx_index);
+            }, std::cref(tx_hash), std::ref(tx_index));
+
+    return future_result.get();
 }
 
 
@@ -202,6 +259,20 @@ CurrentBlockchainStatus::tx_exist(
 
     return false;
 }
+tx_out_index
+CurrentBlockchainStatus::get_output_tx_and_index(
+        uint64_t amount, uint64_t index) const
+{
+    auto future_result = thread_pool->submit(
+        [this](auto amount, auto index)
+            -> tx_out_idxex
+        {
+            return this->mcore
+            ->get_output_tx_and_index(amount, index);
+        }, amount, index);
+
+    return future_result.get();
+}
 
 bool
 CurrentBlockchainStatus::get_tx_with_output(
@@ -215,7 +286,7 @@ CurrentBlockchainStatus::get_tx_with_output(
     {
         // get pair pair<crypto::hash, uint64_t> where first is tx hash
         // and second is local index of the output i in that tx
-        tx_out_idx = mcore->get_output_tx_and_index(amount, output_idx);
+        tx_out_idx = get_output_tx_and_index(amount, output_idx);
     }
     catch (const OUTPUT_DNE& e)
     {
@@ -232,7 +303,7 @@ CurrentBlockchainStatus::get_tx_with_output(
 
     output_idx_in_tx = tx_out_idx.second;
 
-    if (!mcore->get_tx(tx_out_idx.first, tx))
+    if (!get_tx(tx_out_idx.first, tx))
     {
         OMERROR << "Cant get tx: " << tx_out_idx.first;
 
@@ -248,17 +319,28 @@ CurrentBlockchainStatus::get_output_keys(
         const vector<uint64_t>& absolute_offsets,
         vector<cryptonote::output_data_t>& outputs)
 {
-    try
-    {
-        mcore->get_output_key(amount, absolute_offsets, outputs);
-        return true;
-    }
-    catch (const OUTPUT_DNE& e)
-    {
-        OMERROR << "get_output_keys: " << e.what();
-    }
+    auto future_result = thread_pool->submit(
+            [this](auto const& amount,
+                auto const& absolute_offsets,
+                auto& outputs) -> bool
+            {
+                try
+                {
+                    this->mcore->get_output_key(amount,
+                            absolute_offsets, outputs);
+                    return true;
+                }
+                catch (const OUTPUT_DNE& e)
+                {
+                    OMERROR << "get_output_keys: " << e.what();
+                }
 
-    return false;
+                return false;
+
+            }, std::cref(amount), std::cref(absolute_offsets),
+               std::ref(outputs));
+
+    return future_result.get();
 }
 
 
@@ -288,24 +370,50 @@ CurrentBlockchainStatus::get_amount_specific_indices(
         const crypto::hash& tx_hash,
         vector<uint64_t>& out_indices)
 {
-    try
-    {
-        // this index is lmdb index of a tx, not tx hash
-        uint64_t tx_index;
-
-        if (mcore->tx_exists(tx_hash, tx_index))
+    auto future_result = thread_pool->submit(
+        [this](auto const& tx_hash, auto& out_indices)
+            -> bool
         {
-            out_indices = mcore->get_tx_amount_output_indices(tx_index);
+            try
+            {
+                // this index is lmdb index of a tx, not tx hash
+                uint64_t tx_index;
 
-            return true;
-        }
-    }
-    catch(const exception& e)
-    {
-        cerr << e.what() << endl;
-    }
+                if (this->tx_exists(tx_hash, tx_index))
+                {
+                    out_indices = this->mcore
+                            ->get_tx_amount_output_indices(tx_index);
 
-    return false;
+                    return true;
+                }
+            }
+            catch(const exception& e)
+            {
+                OMERROR << e.what();
+            }
+            return false;
+
+        }, std::cref(tx_hash), std::ref(out_indices));
+
+    return future_result.get();
+
+}
+
+bool
+CurrentBlockchainStatus::get_output_histogram(
+        COMMAND_RPC_GET_OUTPUT_HISTOGRAM::request& req,
+        COMMAND_RPC_GET_OUTPUT_HISTOGRAM::response& res) const
+{
+    auto future_result = thread_pool->submit(
+        [this](auto const& req, auto& res)
+            -> bool
+        {
+            return this->mcore
+                    ->get_output_histogram(req, res);
+
+        }, std::cref(req), std::ref(res));
+
+    return future_result.get();
 }
 
 unique_ptr<RandomOutputs>
@@ -313,7 +421,8 @@ CurrentBlockchainStatus::create_random_outputs_object(
         vector<uint64_t> const& amounts,
         uint64_t outs_count) const
 {
-    return make_unique<RandomOutputs>(*mcore, amounts, outs_count);
+    return make_unique<RandomOutputs>(
+            this, amounts, outs_count);
 }
 
 bool
@@ -335,6 +444,26 @@ CurrentBlockchainStatus::get_random_outputs(
 
     return true;
 }
+bool
+CurrentBlockchainStatus::get_outs(
+        COMMAND_RPC_GET_OUTPUTS_BIN::request const& req,
+        COMMAND_RPC_GET_OUTPUTS_BIN::response& res) const
+{
+    auto future_result = thread_pool->submit(
+        [this](auto const& req, auto& res)
+            -> bool
+        {
+            if (!this->mcore->get_outs(req, res))
+            {
+                OMERROR << "mcore->get_outs(req, res) failed";
+                return false;
+            }
+            return true;
+
+        }, std::cref(req), std::ref(res));
+
+    return future_result.get();
+}
 
 bool
 CurrentBlockchainStatus::get_output(
@@ -345,13 +474,11 @@ CurrentBlockchainStatus::get_output(
     COMMAND_RPC_GET_OUTPUTS_BIN::request req;
     COMMAND_RPC_GET_OUTPUTS_BIN::response res;
 
-    req.outputs.push_back(get_outputs_out {amount, global_output_index});
+    req.outputs.push_back(
+            get_outputs_out {amount, global_output_index});
 
-    if (!mcore->get_outs(req, res))
-    {
-        OMERROR << "mcore->get_outs(req, res) failed";
+    if (!get_outs(req, res))
         return false;
-    }
 
     output_info = res.outs.at(0);
 
@@ -361,8 +488,7 @@ CurrentBlockchainStatus::get_output(
 uint64_t
 CurrentBlockchainStatus::get_dynamic_per_kb_fee_estimate() const
 {
-    uint64_t fee_per_kB = mcore->get_dynamic_per_kb_fee_estimate(
-                FEE_ESTIMATE_GRACE_BLOCKS);
+    uint64_t fee_per_kB = get_dynamic_per_kb_fee_estimate();
 
     return fee_per_kB;
 }
@@ -371,7 +497,14 @@ uint64_t
 CurrentBlockchainStatus::get_tx_unlock_time(
         crypto::hash const& tx_hash) const
 {
-    return mcore->get_tx_unlock_time(tx_hash);
+
+    auto future_result = thread_pool->submit(
+        [this](auto const& tx_hash) -> uint64_t
+        {
+            return this->mcore->get_tx_unlock_time(tx_hash);
+        }, std::cref(tx_hash));
+
+    return future_result.get();
 }
 
 bool
@@ -397,11 +530,23 @@ CurrentBlockchainStatus::read_mempool()
     std::vector<tx_info> mempool_tx_info;
     vector<spent_key_image_info> key_image_infos;
 
-    if (!mcore->get_mempool_txs(mempool_tx_info, key_image_infos))
-    {
-        OMERROR << "Getting mempool failed ";
+    auto future_result = thread_pool->submit(
+        [this](auto& mempool_tx_info, auto& key_image_infos)
+            -> bool
+        {
+            if (!this->mcore->get_mempool_txs(
+                        mempool_tx_info, key_image_infos))
+            {
+                OMERROR << "Getting mempool failed ";
+                return false;
+            }
+            return true;
+
+        }, std::ref(mempool_tx_info),
+           std::ref(key_image_infos));
+
+    if (!future_result.get())
         return false;
-    }
 
     // not using this info at present
     (void) key_image_infos;
@@ -572,7 +717,16 @@ CurrentBlockchainStatus::get_output_key(
         uint64_t amount,
         uint64_t global_amount_index)
 {
-    return mcore->get_output_key(amount, global_amount_index);
+
+    auto future_result = thread_pool->submit(
+        [this](auto amount, auto global_amount_index)
+           -> output_data_t
+        {
+            return this->mcore->get_output_key(
+                    amount, global_amount_index);
+        ), amount, global_amount_index);
+
+    return future_result.get();
 }
 
 bool
@@ -790,7 +944,14 @@ CurrentBlockchainStatus::get_tx(
         crypto::hash const& tx_hash,
         transaction& tx)
 {
-    return mcore->get_tx(tx_hash, tx);
+    auto future_result = thread_pool->submit(
+            [this](auto const& tx_hash,
+                   auto& tx) -> bool
+            {
+                return this->mcore->get_tx(tx_hash, tx);
+            }, std::cref(tx_hash), std::ref(tx));
+
+    return future_result.get();
 }
 
 
@@ -806,7 +967,7 @@ CurrentBlockchainStatus::get_tx(
        return false;
     }
 
-    return mcore->get_tx(tx_hash, tx);
+    return get_tx(tx_hash, tx);
 }
 
 bool
@@ -817,7 +978,14 @@ CurrentBlockchainStatus::get_tx_block_height(
     if (!tx_exist(tx_hash))
         return false;
 
-    tx_height = mcore->get_tx_block_height(tx_hash);
+    auto future_result = thread_pool->submit(
+        [this](auto const tx_hash)
+           -> int64_t
+        {
+            return this->mcore->get_tx_block_height(tx_hash);
+        }, std::cref(tx_hash));
+
+    tx_height = future_result.get();
 
     return true;
 }

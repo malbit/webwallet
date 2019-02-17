@@ -135,6 +135,7 @@ MicroCore::get_block_complete_entry(block const& b, block_complete_entry& bce)
 bool
 MicroCore::get_tx(crypto::hash const& tx_hash, transaction& tx) const
 {
+
     if (core_storage.have_tx(tx_hash))
     {
         // get transaction with given hash
@@ -175,7 +176,7 @@ MicroCore::get_output_histogram(
         COMMAND_RPC_GET_OUTPUT_HISTOGRAM::request const& req,
         COMMAND_RPC_GET_OUTPUT_HISTOGRAM::response& res) const
 {
-    // based on bool core_rpc_server::on_get_output_histogram(const ...        
+    // based on bool core_rpc_server::on_get_output_histogram(const ...
 
     MicroCore::histogram_map histogram;
 
@@ -237,5 +238,6 @@ MicroCore::init_success() const
 //    }
 
 //}
+
 
 }
