@@ -98,7 +98,7 @@ find_package(Boost COMPONENTS
         REQUIRED)
 
 # add ARQMACORE submodule
-set(BUILD_ARQMACORE_TESTS OFF CACHE INTERNAL "")
+set(BUILD_XMREGCORE_TESTS OFF CACHE INTERNAL "")
 add_subdirectory(src/arqmacore)
 
 
@@ -123,7 +123,7 @@ target_include_arqma_directories(${PROJECT_NAME})
 
 set(LIBRARIES
         myxrm
-        myxmrcore
+        myxrmcore
         ${Arqma_LIBRARIES}
         restbed
         mysqlpp
