@@ -6,7 +6,7 @@
 
 
 #undef ARQMA_DEFAULT_LOG_CATEGORY
-#define ARQMA_DEFAULT_LOG_CATEGORY "arqwallet"
+#define ARQMA_DEFAULT_LOG_CATEGORY "arq_wallet"
 
 namespace xmreg
 {

@@ -4,7 +4,7 @@
 
 #include "om_log.h"
 #include "src/MicroCore.h"
-#include "ssqlses.h"
+#include "db/ssqlses.h"
 #include "TxUnlockChecker.h"
 #include "BlockchainSetup.h"
 #include "TxSearch.h"
