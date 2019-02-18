@@ -123,7 +123,7 @@ target_include_arqma_directories(${PROJECT_NAME})
 
 set(LIBRARIES
         myxrm
-        myxrmcore
+        arqmacore
         ${Arqma_LIBRARIES}
         restbed
         mysqlpp
