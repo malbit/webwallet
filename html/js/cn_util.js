@@ -1,21 +1,21 @@
 // Copyright (c) 2014-2017, MyMonero.com
-// 
+//
 // All rights reserved.
-// 
+//
 // Redistribution and use in source and binary forms, with or without modification, are
 // permitted provided that the following conditions are met:
-// 
+//
 // 1. Redistributions of source code must retain the above copyright notice, this list of
 //    conditions and the following disclaimer.
-// 
+//
 // 2. Redistributions in binary form must reproduce the above copyright notice, this list
 //    of conditions and the following disclaimer in the documentation and/or other
 //    materials provided with the distribution.
-// 
+//
 // 3. Neither the name of the copyright holder nor the names of its contributors may be
 //    used to endorse or promote products derived from this software without specific
 //    prior written permission.
-// 
+//
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY
 // EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
 // MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL
@@ -278,7 +278,7 @@ var cnUtil = (function(initConfig) {
     // Generate a 64-bit crypto random
     this.rand_8 = function() {
         return mn_random(64);
-    };    
+    };
 
     this.encode_varint = function(i) {
         i = new JSBigInt(i);
@@ -414,13 +414,13 @@ var cnUtil = (function(initConfig) {
         var checksum = this.cn_fast_hash(data);
 
         return cnBase58.encode(data + checksum.slice(0, ADDRESS_CHECKSUM_SIZE * 2));
-    };    
+    };
 
 
     this.decrypt_payment_id = function(payment_id8, tx_public_key, acc_prv_view_key) {
-        if (payment_id8.length !== 16) throw "Invalid input length!";  
+        if (payment_id8.length !== 16) throw "Invalid input length!";
 
-        var key_derivation = this.generate_key_derivation(tx_public_key, acc_prv_view_key);    
+        var key_derivation = this.generate_key_derivation(tx_public_key, acc_prv_view_key);
 
         var pid_key = this.cn_fast_hash(key_derivation + ENCRYPTED_PAYMENT_ID_TAIL.toString(16)).slice(0, INTEGRATED_ID_SIZE * 2);
 
@@ -491,9 +491,15 @@ var cnUtil = (function(initConfig) {
         } else {
             first = seed; //only input reduced seeds or this will not give you the result you want
         }
-
         keys.spend = this.generate_keys(first);
-        var second = this.cn_fast_hash(keys.spend.sec);
+
+        var second;
+        if (seed.length !== 64) {
+            second = this.cn_fast_hash(first);
+        } else {
+            second = this.cn_fast_hash(keys.spend.sec);
+        }
+        
         keys.view = this.generate_keys(second);
         keys.public_addr = this.pubkeys_to_string(keys.spend.pub, keys.view.pub);
         return keys;
@@ -518,7 +524,7 @@ var cnUtil = (function(initConfig) {
         var prefix = dec.slice(0, expectedPrefixSub.length);
         return (prefix === expectedPrefixSub);
     }
-    
+
     this.decode_address = function(address) {
         var dec = cnBase58.decode(address);
         var expectedPrefix = this.encode_varint(CRYPTONOTE_PUBLIC_ADDRESS_BASE58_PREFIX);
@@ -1026,8 +1032,8 @@ var cnUtil = (function(initConfig) {
         var Pb = this.hash_to_ec_2(P);
         return bintohex(nacl.ll.ge_double_scalarmult_postcomp_vartime(hextobin(r), hextobin(Pb), hextobin(c), hextobin(I)));
     };
-        
-        
+
+
 
     //begin RCT functions
 
@@ -1100,7 +1106,7 @@ var cnUtil = (function(initConfig) {
       }
       return bb;
     };
-    
+
     //proveRange
     //proveRange gives C, and mask such that \sumCi = C
     //   c.f. http://eprint.iacr.org/2015/1098 section 5.1
@@ -1167,8 +1173,8 @@ var cnUtil = (function(initConfig) {
       commitMaskObj.mask = mask;
       return sig;
     };
-    
-    
+
+
     function array_hash_to_scalar(array){
       var buf = ""
       for (var i = 0; i < array.length; i++){
@@ -1177,7 +1183,7 @@ var cnUtil = (function(initConfig) {
       }
       return hash_to_scalar(buf);
     }
-    
+
     // Gen creates a signature which proves that for some column in the keymatrix "pk"
     //   the signer knows a secret key for each row in that column
     // we presently only support matrices of 2 rows (pubkey, commitment)
@@ -1192,10 +1198,10 @@ var cnUtil = (function(initConfig) {
         if (pk[i].length !== rows){throw "pk is not rectangular";}
       }
       if (xx.length !== rows){throw "bad xx size";}
-    
+
       var c_old = "";
       var alpha = [];
-    
+
       var rv = {
         ss: [],
         cc: null
@@ -1205,7 +1211,7 @@ var cnUtil = (function(initConfig) {
       }
       var toHash = []; //holds 6 elements: message, pubkey, dsRow L, dsRow R, commitment, ndsRow L
       toHash[0] = message;
-      
+
       //secret index (pubkey section)
       alpha[0] = random_scalar(); //need to save alphas for later
       toHash[1] = pk[index][0]; //secret index pubkey
@@ -1215,9 +1221,9 @@ var cnUtil = (function(initConfig) {
       alpha[1] = random_scalar();
       toHash[4] = pk[index][1]; //secret index commitment
       toHash[5] = ge_scalarmult_base(alpha[1]); //ndsRow L
-    
+
       c_old = array_hash_to_scalar(toHash);
-    
+
       i = (index + 1) % cols;
       if (i === 0){
         rv.cc = c_old;
@@ -1225,7 +1231,7 @@ var cnUtil = (function(initConfig) {
       while (i != index){
         rv.ss[i][0] = random_scalar(); //dsRow ss
         rv.ss[i][1] = random_scalar(); //ndsRow ss
-    
+
         //!secret index (pubkey section)
         toHash[1] = pk[i][0];
         toHash[2] = ge_double_scalarmult_base_vartime(c_old, pk[i][0], rv.ss[i][0]);
@@ -1244,7 +1250,7 @@ var cnUtil = (function(initConfig) {
       }
       return rv;
     };
-    
+
     //prepares for MLSAG_Gen
     this.proveRctMG = function(message, pubs, inSk, kimg, mask, Cout, index){
       var cols = pubs.length;
@@ -1286,7 +1292,7 @@ var cnUtil = (function(initConfig) {
         }
         return buf;
     }
-    
+
     //message is normal prefix hash
     //inSk is vector of x,a
     //kimg is vector of kimg
@@ -1305,7 +1311,7 @@ var cnUtil = (function(initConfig) {
       if (mixRing.length !== inSk.length){throw "mismatched mixRing/inSk";}
       if (inAmounts.length !== inSk.length){throw "mismatched inAmounts/inSk";}
       if (indices.length !== inSk.length){throw "mismatched indices/inSk";}
-      
+
       rv = {
         type: inSk.length === 1 ? RCTTypeFull : RCTTypeSimple,
         message: message,
@@ -1318,7 +1324,7 @@ var cnUtil = (function(initConfig) {
         txnFee: txnFee.toString(),
         pseudoOuts: []
       };
-      
+
       var sumout = Z;
       var cmObj = {
         C: null,
