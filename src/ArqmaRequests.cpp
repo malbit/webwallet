@@ -75,7 +75,7 @@ ArqmaRequests::login(const shared_ptr<Session> session, const Bytes & body)
     // marks if this is new account creation or not
     bool new_account_created {false};
 
-    auto acc = select_account(xmr_address, view_key);
+    auto acc = select_account(xmr_address, view_key, false);
 
     // first check if new account
     // select this account if its existing one
@@ -83,11 +83,7 @@ ArqmaRequests::login(const shared_ptr<Session> session, const Bytes & body)
     {
         // account does not exist, so create new one
         // for this address
-
-        acc = create_account(xmr_address, view_key);
-
-        // insert the new account into the mysql
-        if (!acc)
+        if (!(acc = create_account(xmr_address, view_key)))
         {
             // if creating account failed
             j_response = json {{"status", "error"},
@@ -2014,7 +2010,7 @@ ArqmaRequests::create_account(
 
 boost::optional<XmrAccount>
 ArqmaRequests::select_account(
-        string const& xmr_address),
+        string const& xmr_address,
         string const& view_key,
         bool create_if_notfound) const
 {
