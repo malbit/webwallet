@@ -2,7 +2,7 @@
 #define RANDOMOUTPUTS_H
 
 #include "om_log.h"
-#include "src/MicroCore.h"
+#include "MicroCore.h"
 
 
 namespace xmreg

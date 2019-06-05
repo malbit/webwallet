@@ -9,9 +9,11 @@
 #include <functional>
 
 
+#include "version.h"
 
 #include "CurrentBlockchainStatus.h"
-#include "db/MySqlAccounts.h"
+#include "MySqlAccounts.h"
+#include "../gen/version.h"
 
 #include "../ext/restbed/source/restbed"
 
@@ -29,11 +31,11 @@
 // whether they can talk to a given backend without having to know in
 // advance which version they will stop working with
 // Don't go over 32767 for any of these
-#define ARQWALLET_RPC_VERSION_MAJOR 1
-#define ARQWALLET_RPC_VERSION_MINOR 7
-#define MAKE_ARQWALLET_RPC_VERSION(major,minor) (((major)<<16)|(minor))
-#define ARQWALLET_RPC_VERSION \
-    MAKE_ARQWALLET_RPC_VERSION(ARQWALLET_RPC_VERSION_MAJOR, ARQWALLET_RPC_VERSION_MINOR)
+#define OPENMONERO_RPC_VERSION_MAJOR 1
+#define OPENMONERO_RPC_VERSION_MINOR 6
+#define MAKE_OPENMONERO_RPC_VERSION(major,minor) (((major)<<16)|(minor))
+#define OPENMONERO_RPC_VERSION \
+    MAKE_OPENMONERO_RPC_VERSION(OPENMONERO_RPC_VERSION_MAJOR, OPENMONERO_RPC_VERSION_MINOR)
 
 
 namespace xmreg

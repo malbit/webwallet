@@ -52,7 +52,7 @@ TxSearch::TxSearch(XmrAccount& _acc,
 
     last_ping_timestamp = 0s;
 
-    address_prefix = acc->address.substr(0, 6);
+    address_prefix = acc->address.substr(0,6);
 
     ping();
 }
@@ -287,7 +287,7 @@ for (auto const& tx_tuple: txs_data)
 
         }
 
-        if (!current_bc_status->tx_exists(tx_hash, blockchain_tx_id))
+        if (!current_bc_status->tx_exist(tx_hash, blockchain_tx_id))
         {
             OMERROR << "Tx " << tx_hash_str
                     << " not found in blockchain !";
@@ -455,11 +455,11 @@ for (auto const& tx_tuple: txs_data)
         if (blockchain_tx_id == 0)
         {
             if (!current_bc_status
-                    ->tx_exists(tx_hash, blockchain_tx_id))
+                    ->tx_exist(tx_hash, blockchain_tx_id))
             {
                 OMERROR << address_prefix  + ": tx "
                         << tx_hash_str
-                        << "not found in blockchain !";
+                         << "not found in blockchain !";
                 throw TxSearchException(
                             "Cant get tx from blockchain: "
                             + tx_hash_str);

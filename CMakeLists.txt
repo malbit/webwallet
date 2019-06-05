@@ -15,8 +15,6 @@ if (NOT ARQMA_DIR)
     set(ARQMA_DIR ~/arqma)
 endif()
 
-set( CMAKE_EXPORT_COMPILE_COMMANDS ON )
-
 option(BUILD_TESTS "Build tests for the project" OFF)
 
 message(STATUS ARQMA_DIR ": ${ARQMA_DIR}")
@@ -25,15 +23,13 @@ set(ARQMA_SOURCE_DIR ${ARQMA_DIR}
         CACHE PATH "Path to the root directory for ARQMA")
 
 # set location of ARQMA build tree
-set(ARQMA_BUILD_DIR ${ARQMA_SOURCE_DIR}/build/Linux/release-v0.2.2/release/
+set(ARQMA_BUILD_DIR ${ARQMA_SOURCE_DIR}/build/Linux/master/release/
         CACHE PATH "Path to the build directory for ARQMA")
 
 set(MY_CMAKE_DIR "${CMAKE_CURRENT_LIST_DIR}/cmake"
         CACHE PATH "The path to the cmake directory of the current project")
 
 list(APPEND CMAKE_MODULE_PATH "${MY_CMAKE_DIR}")
-
-list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/src/arqmacore/cmake")
 
 set(CMAKE_LIBRARY_PATH ${CMAKE_LIBRARY_PATH} "${ARQMA_BUILD_DIR}"
         CACHE PATH "Add ARQMA directory for library searching")
@@ -51,6 +47,8 @@ if (${BUILD_TESTS})
             '${CMAKE_SOURCE_DIR}/tests/*')
 endif()
 
+find_package(Arqma)
+
 find_package(MYSQL)
 
 if (NOT MYSQL_INCLUDE_DIR)
@@ -67,7 +65,7 @@ include_directories(${Boost_INCLUDE_DIRS})
 include_directories("ext/restbed/source")
 
 include_directories(
-    ${ARQMA_SOURCE_DIR}/build/Linux/release-v0.2.2
+    ${ARQMA_SOURCE_DIR}/build/Linux/master
     /usr/local/include
     /usr/include/mysql
     /usr/local/opt/openssl/include
@@ -97,10 +95,6 @@ find_package(Boost COMPONENTS
         date_time
         REQUIRED)
 
-# add ARQMACORE submodule
-set(BUILD_XMREGCORE_TESTS OFF CACHE INTERNAL "")
-add_subdirectory(src/arqmacore)
-
 
 # add src/ subfolder
 add_subdirectory(src/)
@@ -115,24 +109,35 @@ set(SOURCE_FILES
 add_executable(${PROJECT_NAME}
         ${SOURCE_FILES})
 
-target_include_directories(${PROJECT_NAME}
-        PRIVATE src/arqmacore)
-
-# include Arqma headers
-target_include_arqma_directories(${PROJECT_NAME})
-
 set(LIBRARIES
         myxrm
-        arqmacore
-        ${Arqma_LIBRARIES}
         restbed
+        wallet
+        cryptonote_core
+        blockchain_db
+        cryptonote_protocol
+        cryptonote_basic
+        cncrypto
+        net
+        lmdb
+        ringct
+        ringct_basic
+        common
+        mnemonics
+        epee
+        easylogging
         mysqlpp
         mysqlclient
-        ${Boost_LIBRARIES}
+        device
+        epee
+        checkpoints
+        version
         sodium
+        ${Boost_LIBRARIES}
         pthread
         unbound
         curl
+        cncrypto
         ssl
         crypto)
 

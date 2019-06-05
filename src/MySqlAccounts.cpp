@@ -5,8 +5,8 @@
 #define MYSQLPP_SSQLS_NO_STATICS 1
 
 #include "MySqlAccounts.h"
-//#include "TxSearch.h"
-#include "../CurrentBlockchainStatus.h"
+#include "TxSearch.h"
+#include "CurrentBlockchainStatus.h"
 
 #include "ssqlses.h"
 

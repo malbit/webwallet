@@ -1,7 +1,0 @@
-[submodule "src/arqmacore"]
-	path = src/arqmacore
-	url = https://github.com/malbit/arqmacore.git
-	branch = master
-	fetchrecursesubmodules = true
-	ignore = none
-	update = merge

@@ -2,7 +2,7 @@
 // Created by marcin on 5/11/15.
 //
 
-#include "utils.h"
+#include "tools.h"
 #include <codecvt>
 
 
@@ -718,21 +718,21 @@ encrypt_payment_id(crypto::hash8 &payment_id,
 	                const crypto::secret_key &secret_key)
 	{
 	    #define ENCRYPTED_PAYMENT_ID_TAIL 0x8d
-
+	
 	    crypto::key_derivation derivation;
 	    crypto::hash hash;
 	    char data[33]; /* A hash, and an extra byte */
-
+	
 	    if (!generate_key_derivation(public_key, secret_key, derivation))
 	        return false;
-
+	
 	    memcpy(data, &derivation, 32);
 	    data[32] = ENCRYPTED_PAYMENT_ID_TAIL;
 	    cn_fast_hash(data, 33, hash);
-
+	
 	    for (size_t b = 0; b < 8; ++b)
 	        payment_id.data[b] ^= hash.data[b];
-
+	
 	    return true;
 	}
 
@@ -850,9 +850,9 @@ decode_ringct(rct::rctSig const& rv,
     try
     {
         crypto::secret_key scalar1;
-
+        
         crypto::derivation_to_scalar(derivation, i, scalar1);
-
+        
         switch (rv.type)
         {
             case rct::RCTTypeSimple:
@@ -952,6 +952,52 @@ parse_crow_post_data(const string& req_body)
     }
     return body;
 }
+
+// based on
+// crypto::public_key wallet2::get_tx_pub_key_from_received_outs(const tools::wallet2::transfer_details &td) const
+public_key
+get_tx_pub_key_from_received_outs(const transaction &tx)
+{
+    std::vector<tx_extra_field> tx_extra_fields;
+
+    if(!parse_tx_extra(tx.extra, tx_extra_fields))
+    {
+        // Extra may only be partially parsed, it's OK if tx_extra_fields contains public key
+    }
+
+    // Due to a previous bug, there might be more than one tx pubkey in extra, one being
+    // the result of a previously discarded signature.
+    // For speed, since scanning for outputs is a slow process, we check whether extra
+    // contains more than one pubkey. If not, the first one is returned. If yes, they're
+    // checked for whether they yield at least one output
+    tx_extra_pub_key pub_key_field;
+
+    if (!find_tx_extra_field_by_type(tx_extra_fields, pub_key_field, 0))
+    {
+        return null_pkey;
+    }
+
+    public_key tx_pub_key = pub_key_field.pub_key;
+
+    bool two_found = find_tx_extra_field_by_type(tx_extra_fields, pub_key_field, 1);
+
+    if (!two_found)
+    {
+        // easy case, just one found
+        return tx_pub_key;
+    }
+    else
+    {
+        // just return second one if there are two.
+        // this does not require private view key, as
+        // its not needed for my use case.
+        return pub_key_field.pub_key;
+    }
+
+    return null_pkey;
+}
+
+
 
 //string
 //xmr_amount_to_str(const uint64_t& xmr_amount, string format)

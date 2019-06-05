@@ -3,7 +3,7 @@
 #include "src/MicroCore.h"
 #include "src/ArqmaRequests.h"
 #include "src/ThreadRAII.h"
-#include "src/db/MysqlPing.h"
+#include "src/MysqlPing.h"
 
 #include <iostream>
 #include <memory>
@@ -93,7 +93,7 @@ defaultConf.setGlobally(el::ConfigurationType::Format,
 			"%datetime [%levshort,%logger,%fbase:%func:%line]"
 		        " %msg");
 
-el::Loggers::reconfigureLogger(ARQWALLET_LOG_CATEGORY, defaultConf);
+el::Loggers::reconfigureLogger(OPENMONERO_LOG_CATEGORY, defaultConf);
 
 OMINFO << "ArqmaWallet is starting";
 

@@ -3,15 +3,15 @@
 #define MYSQLPP_SSQLS_NO_STATICS 1
 
 #include "om_log.h"
-#include "src/MicroCore.h"
-#include "db/ssqlses.h"
+#include "MicroCore.h"
+#include "ssqlses.h"
 #include "TxUnlockChecker.h"
 #include "BlockchainSetup.h"
 #include "TxSearch.h"
-#include "utils.h"
+#include "tools.h"
 #include "ThreadRAII.h"
 #include "RPCCalls.h"
-#include "db/MySqlAccounts.h"
+#include "MySqlAccounts.h"
 #include "RandomOutputs.h"
 
 #include "../ext/ThreadPool.hpp"

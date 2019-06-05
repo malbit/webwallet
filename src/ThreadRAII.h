@@ -2,8 +2,8 @@
 // Created by mwo on 11/07/18.
 //
 
-#ifndef ARQWALLET_THREADRAII_H
-#define ARQWALLET_THREADRAII_H
+#ifndef OPENMONERO_THREADRAII_H
+#define OPENMONERO_THREADRAII_H
 
 #include <thread>
 #include <iostream>
@@ -50,4 +50,4 @@ protected:
 
 }
 
-#endif //ARQWALLET_THREADRAII_H
+#endif //OPENMONERO_THREADRAII_H

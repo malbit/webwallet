@@ -1,7 +1,7 @@
 #ifndef TXUNLOCKCHECKER_H
 #define TXUNLOCKCHECKER_H
 
-#include "src/arqma_headers.h"
+#include "arqma_headers.h"
 
 namespace xmreg
 {

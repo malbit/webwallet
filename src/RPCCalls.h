@@ -6,7 +6,7 @@
 #ifndef CROWXMR_RPCCALLS_H
 #define CROWXMR_RPCCALLS_H
 
-#include "src/arqma_headers.h"
+#include "arqma_headers.h"
 
 #include <mutex>
 #include <chrono>

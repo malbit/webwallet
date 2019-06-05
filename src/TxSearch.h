@@ -1,6 +1,6 @@
 #pragma once
 
-#include "db/MySqlAccounts.h"
+#include "MySqlAccounts.h"
 
 #include <memory>
 #include <mutex>
