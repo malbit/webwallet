@@ -2,8 +2,8 @@
 // Created by mwo on 8/12/16.
 //
 
-#ifndef RESTBED_XMR_YOURMONEROREQUESTS_H
-#define RESTBED_XMR_YOURMONEROREQUESTS_H
+#ifndef RESTBED_XMR_YOURARQMAREQUESTS_H
+#define RESTBED_XMR_YOURARQMAREQUESTS_H
 
 #include <iostream>
 #include <functional>
@@ -22,7 +22,10 @@
                            &xmreg::ArqmaRequests::name, "/" + string(#name));
 #endif
 
-
+#ifndef MAKE_GP_RESOURCE
+#define MAKE_GP_RESOURCE(name) auto name = open_arqma.make_gp_resource( \
+                           &xmreg::ArqmaRequests::name, "/" + string(#name));
+#endif
 
 // When making *any* change here, bump minor
 // If the change is incompatible, then bump major and set minor to 0
@@ -31,11 +34,11 @@
 // whether they can talk to a given backend without having to know in
 // advance which version they will stop working with
 // Don't go over 32767 for any of these
-#define OPENMONERO_RPC_VERSION_MAJOR 1
-#define OPENMONERO_RPC_VERSION_MINOR 6
-#define MAKE_OPENMONERO_RPC_VERSION(major,minor) (((major)<<16)|(minor))
-#define OPENMONERO_RPC_VERSION \
-    MAKE_OPENMONERO_RPC_VERSION(OPENMONERO_RPC_VERSION_MAJOR, OPENMONERO_RPC_VERSION_MINOR)
+#define MYARQMA_RPC_VERSION_MAJOR 1
+#define MYARQMA_RPC_VERSION_MINOR 7
+#define MAKE_MYARQMA_RPC_VERSION(major,minor) (((major)<<16)|(minor))
+#define MYARQMA_RPC_VERSION \
+    MAKE_MYARQMA_RPC_VERSION(MYARQMA_RPC_VERSION_MAJOR, MYARQMA_RPC_VERSION_MINOR)
 
 
 namespace xmreg
@@ -117,6 +120,10 @@ public:
     make_resource(function< void (ArqmaRequests&, const shared_ptr< Session >, const Bytes& ) > handle_func,
                   const string& path);
 
+    shared_ptr<Resource>
+    make_gp_resource(function< void (ArqmaRequests&, const shared_ptr< Session >, const Bytes& ) > handle_func,
+                  const string& path);
+
     static void
     generic_options_handler( const shared_ptr< Session > session );
 
@@ -136,6 +143,9 @@ public:
 
     inline uint64_t
     get_current_blockchain_height();
+
+    void
+    confirm_tx_sent(const shared_ptr<Session> session, const Bytes & body);
 
 private:
 
@@ -170,4 +180,4 @@ private:
 
 
 }
-#endif //RESTBED_XMR_YOURMONEROREQUESTS_H
+#endif //RESTBED_XMR_YOURARQMAREQUESTS_H

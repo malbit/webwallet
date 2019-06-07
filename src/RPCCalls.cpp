@@ -16,7 +16,8 @@ RPCCalls::RPCCalls(string _daemon_url, chrono::seconds _timeout)
 
     m_http_client.set_server(
             daemon_url,
-            boost::optional<epee::net_utils::http::login>{});
+            boost::optional<epee::net_utils::http::login>{},
+            epee::net_utils::ssl_support_t::e_ssl_support_disabled);
 }
 
 bool

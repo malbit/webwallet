@@ -6,18 +6,24 @@
 
 #include "TxSearch.h"
 
-#include "db/MySqlAccounts.h"
+#include "MySqlAccounts.h"
 
-#include "db/ssqlses.h"
+#include "ssqlses.h"
 
 #include "CurrentBlockchainStatus.h"
-#include "src/UniversalIdentifier.hpp"
+#include "UniversalIdentifier.hpp"
+
+#include "ThreadRAII.h"
+
+#include <boost/date_time/posix_time/posix_time.hpp>
 
 namespace xmreg
 {
 
-
-
+boost::asio::io_service& getIOService() {
+    static boost::asio::io_service gIOService;
+    return gIOService;
+}
 
 TxSearch::TxSearch(XmrAccount& _acc,
                    std::shared_ptr<CurrentBlockchainStatus> _current_bc_status)
@@ -54,136 +60,136 @@ TxSearch::TxSearch(XmrAccount& _acc,
 
     address_prefix = acc->address.substr(0,6);
 
+    searching_is_ongoing = true;
+
     ping();
 }
 
 void
 TxSearch::operator()()
 {
+  seconds current_timestamp = get_current_timestamp();
 
-seconds current_timestamp = get_current_timestamp();
-
-last_ping_timestamp = current_timestamp;
-
-uint64_t blocks_lookahead
-        = current_bc_status->get_bc_setup().blocks_search_lookahead;
-
-
-auto current_bc_status_ptr = current_bc_status.get();
-
-searching_is_ongoing = true;
-
-MicroCoreAdapter mcore_addapter {current_bc_status_ptr};
-
-// we put everything in massive catch, as there are plenty ways in which
-// an exceptions can be thrown here. Mostly from mysql.
-// but because this is detatch thread, we cant catch them in main thread.
-// program will blow up if exception is thrown. need to handle exceptions
-// here.
-try
-{
-while(continue_search)
-{
-
-seconds loop_timestamp {current_timestamp};
-
-uint64_t last_block_height = current_bc_status->current_height;
-
-uint64_t h1 = searched_blk_no;
-uint64_t h2 = std::min(h1 + blocks_lookahead - 1, last_block_height);
-
-vector<block> blocks;
-
-blocks = current_bc_status->get_blocks_range(h1, h2);
-
-if (blocks.empty())
-{
-
-    if (h1 <= h2)
-    {
-        OMERROR << address_prefix
-                << ": cant get blocks from " << h1
-                << " to " << h2;
-        stop();
-    }
-    else
-    {
-        OMINFO << address_prefix
-               << ": waiting for new block. "
-                  "Last scanned was " << h2;
-    }
-
-    std::this_thread::sleep_for(
-            std::chrono::seconds(
-                    current_bc_status->get_bc_setup()
-                    .refresh_block_status_every)
-    );
-
-    loop_timestamp = get_current_timestamp();
-
-    // if thread has lived longer than thread_search_li
-    // without last_ping_timestamp being updated,
-    // stop the thread
-    if (loop_timestamp - last_ping_timestamp > thread_search_life)
-    {
-        OMINFO << address_prefix
-                  + ": search thread stopped.";
-        stop();
-    }
-
-    // update current_height of blockchain, as maybe top block(s)
-    // were dropped due to reorganization.
-    //CurrentBlockchainStatus::update_current_blockchain_height();
-
-    // if any txs that we already indexed got orphaned as a
-    // consequence of this
-    // MySqlAccounts::select_txs_for_account_spendability_check
-    // should
-    // update database accordingly when get_address_txs is executed.
-
-    continue;
-}
-
-OMINFO << address_prefix  + ": analyzing "
-       << blocks.size() << " blocks from "
-       << h1 << " to " << h2
-       << " out of " << last_block_height << " blocks";
-
-vector<crypto::hash> txs_hashes_from_blocks;
-vector<transaction> txs_in_blocks;
-vector<CurrentBlockchainStatus::txs_tuple_t> txs_data;
-
-if (!current_bc_status->get_txs_in_blocks(blocks,
-                                          txs_hashes_from_blocks,
-                                          txs_in_blocks,
-                                          txs_data))
-{
-    OMERROR << address_prefix
-               + ": cant get tx in blocks from "
-            << h1 << " to " << h2;
+  if(current_timestamp - last_ping_timestamp > thread_search_life)
+  {
+    OMINFO << address_prefix + ": search thread stopped.";
+    stop();
+    searching_is_ongoing = false;
     return;
-}
+  }
 
-// we will only create mysql DateTime object once, anything is found
-// in a given block;
-unique_ptr<DateTime> blk_timestamp_mysql_format;
+  // last_ping_timestamp = current_timestamp;
 
-// searching for our incoming and outgoing xmr has two components.
-//
-// FIRST. to search for the incoming xmr, we use address, viewkey and
-// outputs public key. Its straight forward, as this is what viewkey was
-// designed to do.
-//
-// SECOND. Searching for spendings (i.e., key images) is more difficult,
-// because we dont have spendkey. But what we can do is, we can look for
-// candidate key images. And this can be achieved by checking if any mixin
-// in associated with the given key image, is our output. If it is our output,
-// then we assume its our key image (i.e. we spend this output).
-// Off course this is only
-// assumption as our outputs can be used in key images of others for their
-// mixin purposes. Thus, we sent to the front end the list of key images
-// that we think are yours, and the frontend, because it has spend key,
-// can filter out false positives.
+  uint64_t blocks_lookahead = current_bc_status->get_bc_setup().blocks_search_lookahead;
+
+  auto current_bc_status_ptr = current_bc_status.get();
+
+  searching_is_ongoing = true;
+
+  MicroCoreAdapter mcore_addapter {current_bc_status_ptr};
+
+  // we put everything in massive catch, as there are plenty ways in which
+  // an exceptions can be thrown here. Mostly from mysql.
+  // but because this is detatch thread, we cant catch them in main thread.
+  // program will blow up if exception is thrown. need to handle exceptions
+  // here.
+  try
+  {
+    //while(continue_search)
+    {
+      seconds loop_timestamp {current_timestamp};
+
+      uint64_t last_block_height = current_bc_status->current_height;
+
+      uint64_t h1 = searched_blk_no;
+      uint64_t h2 = std::min(h1 + blocks_lookahead - 1, last_block_height);
+
+      vector<block> blocks = current_bc_status->get_blocks_range(h1, h2);
+
+      if (blocks.empty())
+      {
+        if (h1 <= h2)
+        {
+          OMERROR << address_prefix << ": cant get blocks from " << h1 << " to " << h2;
+          stop();
+          searching_is_ongoing = false;
+          return;
+        }
+        else
+        {
+          OMINFO << address_prefix << ": waiting for new block. Last scanned was " << h2;
+        }
+
+        /*
+        std::this_thread::sleep_for(std::chrono::seconds(current_bc_status->get_bc_setup().refresh_block_status_every)
+      );
+
+      loop_timestamp = get_current_timestamp();
+
+      // if thread has lived longer than thread_search_li
+      // without last_ping_timestamp being updated,
+      // stop the thread
+      if (loop_timestamp - last_ping_timestamp > thread_search_life)
+      {
+        OMINFO << address_prefix + ": search thread stopped.";
+        stop();
+      }
+
+      // update current_height of blockchain, as maybe top block(s)
+      // were dropped due to reorganization.
+      //CurrentBlockchainStatus::update_current_blockchain_height();
+
+      // if any txs that we already indexed got orphaned as a
+      // consequence of this
+      // MySqlAccounts::select_txs_for_account_spendability_check
+      // should
+      // update database accordingly when get_address_txs is executed.
+
+      continue;
+      */
+      boost::asio::deadline_timer t(getIOService(), boost::posix_time::seconds(current_bc_status->get_bc_setup().refresh_block_status_every.count()));
+      t.async_wait([this](const boost::system::error_code& e)
+      {
+        getTxSearchPool().push([this](int thread_idx) { (*this)(); });
+      });
+      return;
+    }
+    OMINFO << address_prefix  + ": analyzing " << blocks.size() << " blocks from " << h1 << " to " << h2 << " out of " << last_block_height << " blocks";
+
+    vector<crypto::hash> txs_hashes_from_blocks;
+    vector<transaction> txs_in_blocks;
+    vector<CurrentBlockchainStatus::txs_tuple_t> txs_data;
+
+    if (!current_bc_status->get_txs_in_blocks(blocks,
+                                              txs_hashes_from_blocks,
+                                              txs_in_blocks,
+                                              txs_data))
+    {
+      OMERROR << address_prefix + ": cant get tx in blocks from " << h1 << " to " << h2;
+      searching_is_ongoing = false;
+      return;
+    }
+
+    // we will only create mysql DateTime object once, anything is found
+    // in a given block;
+    unique_ptr<DateTime> blk_timestamp_mysql_format;
+
+    // searching for our incoming and outgoing xmr has two components.
+    //
+    // FIRST. to search for the incoming xmr, we use address, viewkey and
+    // outputs public key. Its straight forward, as this is what viewkey was
+    // designed to do.
+    //
+    // SECOND. Searching for spendings (i.e., key images) is more difficult,
+    // because we dont have spendkey. But what we can do is, we can look for
+    // candidate key images. And this can be achieved by checking if any mixin
+    // in associated with the given key image, is our output. If it is our output,
+    // then we assume its our key image (i.e. we spend this output).
+    // Off course this is only
+    // assumption as our outputs can be used in key images of others for their
+    // mixin purposes. Thus, we sent to the front end the list of key images
+    // that we think are yours, and the frontend, because it has spend key,
+    // can filter out false positives.
 
 size_t tx_idx {0};
 
@@ -626,7 +632,10 @@ if (!searched_block_got_updated)
 searched_block_got_updated = false;
 
 } // while(continue_search)
-
+if (continue_search) {
+  getTxSearchPool().push([this](int thread_idx) { (*this)(); });
+  return;
+}
 }
 catch(std::exception const& e)
 {
@@ -646,8 +655,6 @@ searching_is_ongoing = false;
 
 // it will stop anyway, but just call it so we get info message pritened out
 stop();
-
-
 }
 
 void

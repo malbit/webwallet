@@ -2,8 +2,8 @@
 // Created by mwo on 5/11/15.
 //
 
-#ifndef XMREG01_MONERO_HEADERS_H_H
-#define XMREG01_MONERO_HEADERS_H_H
+#ifndef XMREG01_ARQMA_HEADERS_H_H
+#define XMREG01_ARQMA_HEADERS_H_H
 
 #define DB_LMDB   2
 #define BLOCKCHAIN_DB DB_LMDB
@@ -15,7 +15,7 @@
 #define OUTPUT_EXPORT_FILE_MAGIC "Arqma output export\003"
 
 #define FEE_ESTIMATE_GRACE_BLOCKS 10
-#define RECENT_OUTPUT_ZONE ((time_t)(RECENT_OUTPUT_DAYS * 21600))
+#define RECENT_OUTPUT_ZONE ((time_t)(RECENT_OUTPUT_DAYS * 86400))
 
 #include "version.h"
 
@@ -41,5 +41,4 @@
 #include "string_coding.h"
 
 
-#endif //XMREG01_MONERO_HEADERS_H_H
-
+#endif //XMREG01_ARQMA_HEADERS_H_H

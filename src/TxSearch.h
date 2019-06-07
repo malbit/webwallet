@@ -8,8 +8,12 @@
 #include <algorithm>
 #include <unordered_map>
 
+#include <boost/asio.hpp>
+
 namespace xmreg
 {
+
+boost::asio::io_service& getIOService();
 
 using namespace std;
 

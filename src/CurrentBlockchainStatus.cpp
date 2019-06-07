@@ -766,9 +766,9 @@ CurrentBlockchainStatus::start_tx_search_thread(
         // launch SearchTx thread for the given xmr account
 
         searching_threads.insert(
-            {acc.address, ThreadRAII2<TxSearch>(std::move(tx_search))});
+            {acc.address, std::make_unique<ThreadRAII2<TxSearch>>(std::move(tx_search))});
 
-        OMINFO << "Search thread created for address: " << acc.address;
+        OMINFO << "Search thread created for address: " << acc.address.substr(0,6);
     }
     catch (const std::exception& e)
     {
@@ -1038,13 +1038,11 @@ CurrentBlockchainStatus::get_search_thread(string const& acc_address)
 
     if (it == searching_threads.end())
     {
-        OMERROR << "Search thread does not exisit for addr: "
-                << acc_address;
-        throw std::runtime_error("Trying to accesses "
-                                 "non-existing search thread");
+        OMERROR << "Search thread does not exisit for addr: " << acc_address.substr(0,6);
+        throw std::runtime_error("Trying to accesses non-existing search thread");
     }
 
-    return searching_threads.find(acc_address)->second.get_functor();
+    return searching_threads.find(acc_address)->second->get_functor();
 }
 
 void
@@ -1055,14 +1053,14 @@ CurrentBlockchainStatus::clean_search_thread_map()
     for (auto& st: searching_threads)
     {
         if (search_thread_exist(st.first)
-                && st.second.get_functor().still_searching() == false)
+                && st.second->get_functor().still_searching() == false)
         {
 
             // before erasing a search thread, check if there was any
             // exception thrown by it
             try
             {
-                auto eptr = st.second.get_functor().get_exception_ptr();
+                auto eptr = st.second->get_functor().get_exception_ptr();
                 if (eptr != nullptr)
                     std::rethrow_exception(eptr);
             }
@@ -1085,7 +1083,7 @@ CurrentBlockchainStatus::stop_search_threads()
 
     for (auto& st: searching_threads)
     {
-	st.second.get_functor().stop();
+	st.second->get_functor().stop();
     }
 }
 

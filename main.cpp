@@ -3,6 +3,7 @@
 #include "src/MicroCore.h"
 #include "src/ArqmaRequests.h"
 #include "src/ThreadRAII.h"
+#include "src/TxSearch.h"
 #include "src/MysqlPing.h"
 
 #include <iostream>
@@ -240,6 +241,21 @@ std::thread mysql_ping_thread(
 
 OMINFO << "MySQL ping thread started";
 
+bool stop_io_service = false;
+std::thread io_service_thread([&stop_io_service, &current_bc_status]() {
+    while (!stop_io_service) {
+        xmreg::getIOService().run();
+        xmreg::getIOService().reset();
+        std::this_thread::sleep_for(std::chrono::seconds(current_bc_status->get_bc_setup().refresh_block_status_every));
+    }
+});
+
+OMINFO << "ASIO IO service thread started";
+
+xmreg::getTxSearchPool();
+
+OMINFO << "TxSearch thread pool started";
+
 // create REST JSON API services
 xmreg::ArqmaRequests open_arqma(mysql_accounts, current_bc_status);
 
@@ -253,7 +269,8 @@ MAKE_RESOURCE(submit_raw_tx);
 MAKE_RESOURCE(import_wallet_request);
 MAKE_RESOURCE(import_recent_wallet_request);
 MAKE_RESOURCE(get_tx);
-MAKE_RESOURCE(get_version);
+MAKE_RESOURCE(confirm_tx_sent);
+MAKE_GP_RESOURCE(get_version);
 
 // restbed service
 Service service;
@@ -268,6 +285,7 @@ service.publish(submit_raw_tx);
 service.publish(import_wallet_request);
 service.publish(import_recent_wallet_request);
 service.publish(get_tx);
+service.publish(confirm_tx_sent);
 service.publish(get_version);
 
 OMINFO << "JSON API endpoints published";
@@ -342,6 +360,13 @@ restbed_service.join();
 OMINFO << "Stoping blockchain_monitoring_thread. Please wait.";
 current_bc_status->stop();
 blockchain_monitoring_thread.join();
+
+OMINFO << "Stopping TxSearch thread pool. Please wait.";
+xmreg::getTxSearchPool().stop();
+
+OMINFO << "Stopping ASIO IO service thread. Please wait.";
+stop_io_service = true;
+io_service_thread.join();
 
 OMINFO << "Stoping mysql_ping. Please wait.";
 mysql_ping.stop();
